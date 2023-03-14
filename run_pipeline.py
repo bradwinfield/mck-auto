@@ -18,6 +18,9 @@ import merge_files
 # CONSTANTS
 vcenter_version = "7.0.3"
 
+# Global variables
+total_errors = 0
+
 # This script will prepare an on-premise vSphere environment for 
 # its first deployment of a TKGs workload cluster.
 
@@ -32,6 +35,51 @@ def run_a_command(command):
     returns = subprocess.run(cmd_parts)
     dprint("Command finished with exit code: " + str(returns.returncode))
     return returns.returncode
+
+def confirm_file(filename):
+    for fname in os.listdir("."):
+        if fname == filename:
+            return True 
+    return False
+
+def need_terraform_init():
+    if confirm_file("terraform.tfstate"):
+        return False
+    return True 
+
+def run_terraform(tfolder):
+    exit_code = 1
+    pmsg.blue("=-=-=-=-=-=-= Running Terraform in " + tfolder + " =-=-=-=-=-=-=-=")
+    # cd to that folder
+    dir_orig = os.getcwd()
+    os.chdir(tfolder)
+
+    # verify that a "main.tf" is here...
+    if confirm_file("main.tf"):
+        # run terraform init
+        result = 0
+        if need_terraform_init():
+            result = run_a_command("terraform init")
+        if result == 0:
+            # run terrafor plan
+            result = run_a_command("terraform plan -out=myplan.tfplan")
+            if result == 0:
+                # run terraform apply
+                result = run_a_command("terraform apply myplan.tfplan")
+                if result == 0:
+                    dprint("Terraform of " + tfolder + " completed successfully.")
+                    exit_code = 0
+                else:
+                    pmsg.fail("Terraform apply failed in " + tfolder + ".")
+            else:
+                pmsg.fail ("Terraform plan -out=myplan.tfplan failed in " + tfolder + ".")
+        else:
+            pmsg.fail("Terraform init failed in " + tfolder + ".")
+    else:
+        pmsg.fail("The main.tf file not found in " + tfolder + ".")
+    # Leave us back in the original directory
+    os.chdir(dir_orig)
+    return exit_code
 
 ############################ Main ################################
 # setup args...
@@ -85,7 +133,24 @@ else:
     exit (1)
 
 ###################### Step 1 ########################
+# Setup the environment with all the variables found in the configuration file.
+for varname in configs:
+    if configs[varname] is not None:
+        dprint("Putting " + str(varname) + " in the environment...")
+        os.environ[varname] = configs[varname]
+
+###################### Next Step ########################
+# Check/Create Users (TKG and AVI). Terraform does not appear to do this.
+total_errors += run_a_command("./check_users.py -c " + args.config_file)
+
+###################### Next Step ########################
+# Run terraform for folders
+total_errors += run_terraform("vCenter_folder")
 
 ###################### Done ########################
-print ("")
+print ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+if total_errors > 0:
+    pmsg.warning("There were " + str(total_errors) + ".")
+else:
+    pmsg.green("Success! There were no errors or warnings.")
 pmsg.blue ("Done.")
