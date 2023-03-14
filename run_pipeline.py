@@ -145,12 +145,12 @@ total_errors += run_a_command("./check_users.py -c " + args.config_file)
 
 ###################### Next Step ########################
 # Run terraform for folders
-total_errors += run_terraform("vCenter_folder")
+total_errors += run_terraform("terraform")
 
 ###################### Done ########################
 print ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 if total_errors > 0:
-    pmsg.warning("There were " + str(total_errors) + ".")
+    pmsg.warning("Number of errors/warnings encountered: " + str(total_errors) + ".")
 else:
     pmsg.green("Success! There were no errors or warnings.")
 pmsg.blue ("Done.")
