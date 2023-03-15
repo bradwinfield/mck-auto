@@ -16,11 +16,31 @@ variable "vsphere_password" {
   default     = ""
 }
 
+variable "vsphere_datacenter" {
+  type        = string
+  description = "Datacenter name."
+  default     = ""
+}
+
+variable "cluster_name" {
+  type        = string
+  description = "Cluster name."
+  default     = ""
+}
+
 provider "vsphere" {
   user           = var.vsphere_user
   password       = var.vsphere_password
   vsphere_server = var.vsphere_server
   allow_unverified_ssl = true
+}
+
+data "vsphere_datacenter" "datacenter" {
+  name = var.vsphere_datacenter
+}
+data "vsphere_compute_cluster" "cluster" {
+  name = var.cluster_name
+  datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
 resource "vsphere_role" "TKG-Admin" {
@@ -38,3 +58,18 @@ resource "vsphere_role" "AviRole-Folder" {
   role_privileges = ["Folder.Create", "Network.Assign", "Network.Delete", "Resource.AssignVMToPool", "Task.Create", "Task.Update", "VApp.ApplicationConfig", "VApp.AssignResourcePool", "VApp.AssignVApp", "VApp.AssignVM", "VApp.Create", "VApp.Delete", "VApp.Export", "VApp.Import", "VApp.InstanceConfig", "VApp.PowerOff", "VApp.PowerOn", "VirtualMachine.Config.AddExistingDisk", "VirtualMachine.Config.AddNewDisk", "VirtualMachine.Config.AddRemoveDevice", "VirtualMachine.Config.AdvancedConfig", "VirtualMachine.Config.CPUCount", "VirtualMachine.Config.DiskExtend", "VirtualMachine.Config.DiskLease", "VirtualMachine.Config.EditDevice", "VirtualMachine.Config.Memory", "VirtualMachine.Config.MksControl", "VirtualMachine.Config.RemoveDisk", "VirtualMachine.Config.Resource", "VirtualMachine.Config.Settings", "VirtualMachine.Interact.DeviceConnection", "VirtualMachine.Interact.PowerOff", "VirtualMachine.Interact.PowerOn", "VirtualMachine.Interact.Reset", "VirtualMachine.Interact.ToolsInstall", "VirtualMachine.Inventory.Create", "VirtualMachine.Inventory.Delete", "VirtualMachine.Inventory.Register", "VirtualMachine.Inventory.Unregister", "VirtualMachine.Provisioning.DeployTemplate", "VirtualMachine.Provisioning.DiskRandomAccess", "VirtualMachine.Provisioning.DiskRandomRead", "VirtualMachine.Provisioning.FileRandomAccess", "VirtualMachine.Provisioning.MarkAsVM"]
 }
 
+resource "vsphere_role" "Modify-Cluster-Wide-Configurations" {
+  name = "Modify-Cluster-Wide-Configurations"
+  role_privileges = ["Namespaces.Manage"]
+}
+
+resource "vsphere_entity_permissions" "tkg-admin-cluster" {
+  entity_id = data.vsphere_compute_cluster.cluster.id
+  entity_type = "ClusterComputeResource"
+  permissions {
+    user_or_group = "local.os\\tkg_admin"
+    propagate = true
+    is_group = false
+    role_id = vsphere_role.Modify-Cluster-Wide-Configurations.id
+  }
+}
