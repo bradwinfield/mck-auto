@@ -32,7 +32,8 @@ def run_a_command(command):
     # Split up 'command' so it can be run with the subprocess.run method...
     pmsg.running (command)
     cmd_parts = command.split()
-    returns = subprocess.run(cmd_parts)
+    myenv = dict(os.environ)
+    returns = subprocess.run(cmd_parts, env=myenv)
     dprint("Command finished with exit code: " + str(returns.returncode))
     return returns.returncode
 
@@ -138,6 +139,7 @@ for varname in configs:
     if configs[varname] is not None:
         dprint("Putting " + str(varname) + " in the environment...")
         os.environ[varname] = configs[varname]
+        os.environ["TF_VAR_"+varname] = configs[varname]
 
 ###################### Next Step ########################
 # Check/Create Users (TKG and AVI). Terraform does not appear to do this.
