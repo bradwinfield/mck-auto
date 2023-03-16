@@ -8,7 +8,10 @@ tkg_user_password: "6-SX1x6yG&tKJHxsgNt"
 tkg_role: TKG
 cluster_name: vc01cl01
 cluster_plan: dev
+vsphere_namespace: tkgns1
+workload_cluster: test-wl
 vsphere_datacenter: vc01
+storage_class: vc01cl01-t0compute
 datastore: vsanDatastore
 #datastores: [vsanDatastore]
 resource_pool: tkg-management-components
