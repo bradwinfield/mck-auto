@@ -2,7 +2,7 @@
 vsphere_server: "vc01.h2o-2-7752.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "6-SX1x6yG&tKJHxsgNt"
-tkg_user: 'tkg-admin'
+tkg_user: "tkg-admin"
 # Note that the password must conform to the vSphere user password policy.
 tkg_user_password: "6-SX1x6yG&tKJHxsgNt"
 tkg_role: TKG
@@ -46,7 +46,7 @@ avi_enable: "true"
 avi_labels: ""
 avi_management_cluster_vip_network_name: 
 avi_management_cluster_vip_network_cidr: 
-avi_username: avi-admin
+avi_username: "avi-admin"
 avi_password: "6-SX1x6yG&tKJHxsgNt"
 avi_service_engine_group: 
 cluster_cidr: 100.96.0.0/11

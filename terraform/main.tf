@@ -66,17 +66,17 @@ resource "vsphere_entity_permissions" "tkg-admin-cluster" {
   entity_id = data.vsphere_compute_cluster.cluster.id
   entity_type = "ClusterComputeResource"
   permissions {
-    user_or_group = "local.os\\${var.tkg_user}"
+    user_or_group = "LOCAL.OS\\${var.tkg_user}"
     propagate = true
     is_group = false
     role_id = vsphere_role.Modify-Cluster-Wide-Configurations.id
   }
 }
 resource "vsphere_entity_permissions" "avi-admin-global" {
-  entity_id = data.vsphere_datacenter.datacenter.id
-  entity_type = "Datacenter"
+  entity_id = data.vsphere_compute_cluster.cluster.id
+  entity_type = "ClusterComputeResource"
   permissions {
-    user_or_group = "local.os\\${var.avi_username}"
+    user_or_group = "LOCAL.OS\\${var.avi_username}"
     propagate = true
     is_group = false
     role_id = vsphere_role.AviRole-Global.id
@@ -86,7 +86,7 @@ resource "vsphere_entity_permissions" "avi-admin-folder" {
   entity_id = data.vsphere_folder.avi-se-folder.id
   entity_type = "Folder"
   permissions {
-    user_or_group = "local.os\\${var.avi_username}"
+    user_or_group = "LOCAL.OS\\${var.avi_username}"
     propagate = true
     is_group = false
     role_id = vsphere_role.AviRole-Folder.id
