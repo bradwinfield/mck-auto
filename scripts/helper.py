@@ -6,6 +6,7 @@ import os
 import subprocess
 import pmsg
 import re
+import re
 
 
 class helper():
@@ -37,6 +38,7 @@ def run_a_command(command):
 #############################################################
 def check_for_result(command_and_args_list, expression):
     """Checks to see if a given command returns an expected value.
+
     Args:
         command_and_args_list (list): Run this command with arguments and capture the output.
         expression (string): Split the result of the command into lines and see if any line matches this expression.
