@@ -134,12 +134,12 @@ for varname in configs:
         os.environ["TF_VAR_"+varname] = configs[varname]
 
 ###################### Next Step ########################
-# Login to the k8s cluster...
-total_errors += helper.run_a_command("./scripts/k8s_cluster_login.py")
-
-###################### Next Step ########################
 # Check/Create Users (TKG and AVI). Terraform does not appear to do this.
 total_errors += helper.run_a_command("./scripts/check_users.py -c " + args.config_file)
+
+###################### Next Step ########################
+# Login to the k8s cluster...
+total_errors += helper.run_a_command("./scripts/k8s_cluster_login.py")
 
 ###################### Next Step ########################
 # Check/Change Storage Class to be the default...
