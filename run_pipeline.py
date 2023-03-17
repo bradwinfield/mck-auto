@@ -139,11 +139,20 @@ total_errors += helper.run_a_command("./scripts/check_users.py -c " + args.confi
 
 ###################### Next Step ########################
 # Login to the k8s cluster...
-total_errors += helper.run_a_command("./scripts/k8s_cluster_login.py")
+rc = helper.run_a_command("./scripts/k8s_cluster_login.py")
+# At this point, if the login to the cluster fails, we need to abort since subsequent scripts
+# assume that we are already logged-in to the cluster and the correct context is set.
+if rc != 0:
+    pmsg.fail("Failed to login to the new cluster. Aborting since subsequent steps assume we are logged into the cluster.")
+    exit(99)
 
 ###################### Next Step ########################
 # Check/Change Storage Class to be the default...
 total_errors += helper.run_a_command("./scripts/check_sc.py")
+
+###################### Next Step ########################
+# Check/Install kapp controller.
+total_errors += helper.run_a_command("./scripts/check_kapp.py")
 
 ###################### Next Step ########################
 # Run terraform for folders
