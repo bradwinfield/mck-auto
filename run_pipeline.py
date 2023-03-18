@@ -139,17 +139,29 @@ total_errors += helper.run_a_command("./scripts/check_users.py -c " + args.confi
 
 ###################### Next Step ########################
 # Login to the k8s cluster...
-total_errors += helper.run_a_command("./scripts/k8s_cluster_login.py")
+rc = helper.run_a_command("./scripts/k8s_cluster_login.py")
+# At this point, if the login to the cluster fails, we need to abort since subsequent scripts
+# assume that we are already logged-in to the cluster and the correct context is set.
+if rc != 0:
+    pmsg.fail("Failed to login to the new cluster. Aborting since subsequent steps assume we are logged into the cluster.")
+    exit(99)
 
 ###################### Next Step ########################
 # Check/Change Storage Class to be the default...
 total_errors += helper.run_a_command("./scripts/check_sc.py")
 
 ###################### Next Step ########################
+# Check/Install kapp controller.
+total_errors += helper.run_a_command("./scripts/check_kapp.py")
+
+###################### Next Step ########################
+<<<<<<< HEAD
 # Check/install tanzu-standard package repo...
 total_errors += helper.run_a_command("./scripts/tanzu_package.py")
 
 ###################### Next Step ########################
+=======
+>>>>>>> 57f196bd0e58f8a9a7529a507745c0991b1cbd82
 # Run terraform for folders
 total_errors += run_terraform("terraform")
 
