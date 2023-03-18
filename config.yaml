@@ -101,3 +101,7 @@ vip_network_interface: "eth0"
 # left commented-out
 # ssh_public_key:
 # vsphere_tls_thumbprint
+
+tanzu_package_registry: "projects.registry.vmware.com/tkg/packages/standard/repo"
+tanzu_package_registry_version: "v1.6.1"
+tanzu_standard_package_repo_name: "tanzupackages"

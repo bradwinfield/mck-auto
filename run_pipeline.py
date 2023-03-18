@@ -146,6 +146,10 @@ total_errors += helper.run_a_command("./scripts/k8s_cluster_login.py")
 total_errors += helper.run_a_command("./scripts/check_sc.py")
 
 ###################### Next Step ########################
+# Check/install tanzu-standard package repo...
+total_errors += helper.run_a_command("./scripts/tanzu_package.py")
+
+###################### Next Step ########################
 # Run terraform for folders
 total_errors += run_terraform("terraform")
 
