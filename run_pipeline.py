@@ -155,10 +155,13 @@ total_errors += helper.run_a_command("./scripts/check_sc.py")
 total_errors += helper.run_a_command("./scripts/check_kapp.py")
 
 ###################### Next Step ########################
+<<<<<<< HEAD
 # Check/install tanzu-standard package repo...
 total_errors += helper.run_a_command("./scripts/tanzu_package.py")
 
 ###################### Next Step ########################
+=======
+>>>>>>> 57f196bd0e58f8a9a7529a507745c0991b1cbd82
 # Run terraform for folders
 total_errors += run_terraform("terraform")
 
