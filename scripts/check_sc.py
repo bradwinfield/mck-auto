@@ -6,7 +6,6 @@
 import subprocess
 import re
 import os
-import helper
 import pmsg
 
 storage_class = os.environ["storage_class"]
