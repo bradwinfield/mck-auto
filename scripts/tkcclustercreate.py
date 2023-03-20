@@ -3,6 +3,7 @@
 import helper
 import interpolate
 import pmsg
+import os
 
 yaml_source = "config.yaml"
 template_file = "templates/workload-cluster-template.yaml"

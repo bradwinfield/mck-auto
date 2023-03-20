@@ -10,7 +10,7 @@ cluster_name: vc01cl01
 cluster_plan: dev
 vsphere_namespace: tkgns1
 supervisor_cluster: "vc01cl01-wcp.h2o-2-7752.h2o.vmware.com"
-workload_cluster: workload2
+workload_cluster: workload3
 vsphere_datacenter: vc01
 storage_class: vc01cl01-t0compute
 datastore: vsanDatastore
@@ -116,8 +116,8 @@ tanzu_standard_package_repo_name: "tanzupackages"
 #tkr = "<tanzu_k8s_releaseversion>"
 
 cp_vmclass_size: "best-effort-medium"
-control_plane_count: "3"
-worker_node_count: "5"
+control_plane_count: "1"
+worker_node_count: "3"
 worker_vmclass_size: "best-effort-medium"
 ctrd_disksize: "25Gi"
 kubelet_disksize: "15Gi"

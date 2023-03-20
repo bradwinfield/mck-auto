@@ -22,7 +22,7 @@ if not helper.check_for_result(["kubectl", "get", "psp"], '^tanzu-system-kapp-ct
         exit(1)
 
     # Double-check...
-    if not helper.check_for_result("kubectl get psp", '^tanzu-system-kapp-ctrl-restricted'):
+    if not helper.check_for_result(["kubectl", "get", "psp"], 'tanzu-system-kapp-ctrl-restricted'):
         pmsg.fail("Can't install the PSP that the kapp controller needs.")
         exit(1)
 
@@ -39,8 +39,8 @@ if not helper.check_for_result(["kubectl", "get", "pods", "-n", "tkg-system"], '
 kapp_running = helper.check_for_result_for_a_time(
     ["kubectl", "get", "pods", "-n", "tkg-system"],
     'kapp-controller-.*Running',
-    2,
-    10)
+    10,
+    30)
 if not kapp_running:
     pmsg.fail("Kapp Controller pod not running.")
     exit(1)
