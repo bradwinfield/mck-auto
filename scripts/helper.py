@@ -21,6 +21,23 @@ def __init__(self):
 
 
 # ########################################################
+def run_a_command_list(command):
+    """
+    :param command: List of command and all its arguments.
+    :returns: Integer - Returns the number of errors the command caused.
+    :rtype: int
+    """
+
+    # Split up 'command' so it can be run with the subprocess.run method...
+    myenv = dict(os.environ)
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=myenv)
+    output, err = process.communicate()
+    if err is not None:
+        return 1
+    return 0
+
+
+# ########################################################
 def run_a_command(command):
     """
     :param command: String of command and all its arguments.
@@ -34,6 +51,20 @@ def run_a_command(command):
     myenv = dict(os.environ)
     returns = subprocess.run(cmd_parts, env=myenv)
     return returns.returncode
+
+#############################################################
+def run_a_command_get_stdout(command_and_args_list):
+    tlines = []
+    process = subprocess.Popen(command_and_args_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, err = process.communicate()
+    # Split up the lines and decode each line and remove newlines...
+    if output is not None:
+        lines = output.splitlines()
+        for line in lines:
+            tlines.append(line.decode('utf-8').strip())
+            
+    return tlines
+
 
 #############################################################
 def check_for_result(command_and_args_list, expression):
