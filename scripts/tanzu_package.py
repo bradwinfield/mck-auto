@@ -23,12 +23,7 @@ if not helper.check_for_result(["tanzu", "package", "repository", "list", "-A"],
         exit(1)
 
     # Double check ...
-    repo_ready = False
-    for i in range(30):
-        if helper.check_for_result(["tanzu", "package", "repository", "list", "-A"], expression):
-            repo_ready = True
-            break
-        time.sleep(2)
+    repo_ready = helper.check_for_result_for_a_time(["tanzu", "package", "repository", "list", "-A"], expression, 2, 45)
     if not repo_ready:
         pmsg.fail("Can't create local repo " + repo + ".")
         exit(1)

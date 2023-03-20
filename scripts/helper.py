@@ -54,3 +54,29 @@ def check_for_result(command_and_args_list, expression):
         if re.search(expression, line.decode("utf-8")) is not None:
             return True
     return False
+
+
+def check_for_result_for_a_time(command_and_args_list, expression, check_how_often, max_checks):
+    """
+    Run a command with arguments and check the output for a specific string of text (regular expression) over a time period.
+    
+    Args:
+        command_and_args_list (list): Run this command with arguments and capture the output.
+        expression (string): Split the result of the command into lines and see if any line matches this expression.
+        check_how_often (int): check every <check_how_often> seconds for the expression.
+        max_checks (int): check a maxiumum of this many times before giving up.
+        
+    :returns: Boolean - Match or no match
+    :rtype: Boolean
+
+    """
+    found = False
+    for i in range(30):
+        if check_for_result(["tanzu", "package", "repository", "list", "-A"], expression):
+            found = True
+            break
+        time.sleep(check_how_often)
+
+    if not found:
+        return False
+    return True
