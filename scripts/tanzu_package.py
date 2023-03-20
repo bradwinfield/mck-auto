@@ -28,5 +28,11 @@ if not helper.check_for_result(["tanzu", "package", "repository", "list", "-A"],
         pmsg.fail("Can't create local repo " + repo + ".")
         exit(1)
 
+# And check for cert-manager and contour
+found_contour = helper.check_for_result(["tanzu", "package", "available", "list", "-A"], "contour")
+if not found_contour:
+    pmsg.fail("Can't find contour in the list of available packages.")
+    exit(1)
+
 pmsg.green("Local package repo " + repo + " OK.")
 exit(0)
