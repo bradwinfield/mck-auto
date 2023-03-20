@@ -6,10 +6,7 @@ import os
 import subprocess
 import pmsg
 import re
-<<<<<<< HEAD
 import re
-=======
->>>>>>> 57f196bd0e58f8a9a7529a507745c0991b1cbd82
 
 
 class helper():

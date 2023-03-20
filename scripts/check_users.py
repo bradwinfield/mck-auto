@@ -4,6 +4,7 @@ import vcenter_api
 import pmsg
 import argparse
 import yaml
+import os
 
 def dprint(msg):
     if verbose:
@@ -39,7 +40,6 @@ def check_vcenter_user(server, token, username, password):
 help_text = "Create/Check vCenter users for TKGs install."
 
 parser = argparse.ArgumentParser(description=help_text)
-parser.add_argument('-c', '--config_file', required=True, help='Name of yaml file which contains config params')
 parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
 parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose mode.')
 args = parser.parse_args()
@@ -48,21 +48,13 @@ args = parser.parse_args()
 verbose = args.verbose
 dry_run = args.dry_run
 
-# Read configuration file.
-with open(args.config_file, "r") as cf:
-    try:
-        configs = yaml.safe_load(cf)
-    except yaml.YAMLError as exc:
-        pmsg.fail(exc)
-        exit(1)
-
-server = configs["vsphere_server"]
-username = configs["vsphere_username"]
-password = configs["vsphere_password"]
-tkg_user = configs["tkg_user"]
-tkg_user_password = configs["tkg_user_password"]
-avi_admin = configs["avi_username"]
-avi_password = configs["avi_password"]
+server = os.environ["vsphere_server"]
+username = os.environ["vsphere_username"]
+password = os.environ["vsphere_password"]
+tkg_user = os.environ["tkg_user"]
+tkg_user_password = os.environ["tkg_user_password"]
+avi_admin = os.environ["avi_username"]
+avi_password = os.environ["avi_password"]
 
 token = vcenter_api.vcenter_login(server, username, password)
 if len(token) < 1:

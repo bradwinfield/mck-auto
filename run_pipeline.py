@@ -5,8 +5,9 @@ import importlib.util
 import os
 import sys
 import yaml
+import re
 
-# import pdb
+#import pdb
 # pdb.set_trace()
 sys.path.append(r'./scripts')
 import pmsg
@@ -17,6 +18,7 @@ vcenter_version = "7.0.3"
 
 # Global variables
 total_errors = 0
+errors = 0
 
 # This script will prepare an on-premise vSphere environment for
 # its first deployment of a TKGs workload cluster.
@@ -38,6 +40,16 @@ def need_terraform_init():
     if confirm_file("terraform.tfstate"):
         return False
     return True
+
+
+def next_step_is_abort(steps, idx):
+    if idx >= len(steps) - 1:
+        # last line. 
+        return False
+    if re.search('abort', steps[idx+1], re.IGNORECASE) is not None:
+        # next line must be 'Abort' so return True
+        return True
+    return False
 
 
 def run_terraform(tfolder):
@@ -82,6 +94,7 @@ help_text += "./run_pipeline.py --help\n"
 
 parser = argparse.ArgumentParser(description='Pipeline main script to deploy a TKGs workload cluster.')
 parser.add_argument('-c', '--config_file', required=True, help='Name of yaml file which contains config params')
+parser.add_argument('-s', '--steps_file', required=True, help='Name of steps file; what scripts will run this time.')
 parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
 parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose output.')
 
@@ -106,26 +119,28 @@ if os.path.exists(args.config_file):
             pmsg.fail(exc)
             exit (1)
 else:
-    pmsg.fail ("The config file does not exist. Please check the command line and try again.")
+    pmsg.fail("The config file does not exist. Please check the command line and try again.")
     exit(1)
 
-# simpler variables
-server = configs["vsphere_server"]
-username = configs["vsphere_username"]
-password = configs["vsphere_password"]
-cluster = configs["cluster_name"]
+# Read the steps file
+if os.path.exists(args.steps_file):
+    with open(args.steps_file, "r") as sf:
+        steps = sf.read().splitlines()
+else:
+    pmsg.fail("The steps file does not exist. Please check the command line and try again.")
+    exit(1)
 
 # Check Pre-requisites
 # 1. Need pyvmomi tools
 if "pyVmomi" in sys.modules:
-    dprint ("pyVmomi tools found in sys.modules.")
+    dprint("pyVmomi tools found in sys.modules.")
 elif (spec := importlib.util.find_spec("pyVmomi")) is not None:
-    dprint ("pyVmomi tools found using importlib.util.find_spec.")
+    dprint("pyVmomi tools found using importlib.util.find_spec.")
 else:
-    pmsg.FAIL (" You need to install pyVmomi. See https://pypi.org/project/pyvmomi/ (or just run $ pip3 install --upgrade pyvmomi.)")
-    exit (1)
+    pmsg.FAIL(" You need to install pyVmomi. See https://pypi.org/project/pyvmomi/ (or just run $ pip3 install --upgrade pyvmomi.)")
+    exit(1)
 
-###################### Step 1 ########################
+###################### Put all the config parameters into the environment ########################
 # Setup the environment with all the variables found in the configuration file.
 for varname in configs:
     if configs[varname] is not None:
@@ -133,34 +148,49 @@ for varname in configs:
         os.environ[varname] = configs[varname]
         os.environ["TF_VAR_"+varname] = configs[varname]
 
-###################### Next Step ########################
-# Check/Create Users (TKG and AVI). Terraform does not appear to do this.
-total_errors += helper.run_a_command("./scripts/check_users.py -c " + args.config_file)
+###################### Execute all the steps in order ########################
+abort_exit = False
+for idx, step in enumerate(steps):
+    step_type = ""
+    if abort_exit:
+        break
 
-###################### Next Step ########################
-# Login to the k8s cluster...
-rc = helper.run_a_command("./scripts/k8s_cluster_login.py")
-# At this point, if the login to the cluster fails, we need to abort since subsequent scripts
-# assume that we are already logged-in to the cluster and the correct context is set.
-if rc != 0:
-    pmsg.fail("Failed to login to the new cluster. Aborting since subsequent steps assume we are logged into the cluster.")
-    exit(99)
+    # Ignore comment/empty lines..match.
+    if re.search("^\\s*#|^\\s*$", step) is not None:
+        continue
 
-###################### Next Step ########################
-# Check/Change Storage Class to be the default...
-total_errors += helper.run_a_command("./scripts/check_sc.py")
+    # What kind of step is this?
+    # Is it a script?
+    stepname = "./scripts/" + step.strip()
+    if os.path.exists(stepname):
+        # Must be a script...
+        step_type = "script"
+        errors = helper.run_a_command(stepname)
+        total_errors += errors
+        if errors > 0 and next_step_is_abort(steps, idx):
+            pmsg.fail("This last script had errors. Aborting per the step file.")
+            abort_exit = True
+        continue
 
-###################### Next Step ########################
-# Check/Install kapp controller.
-total_errors += helper.run_a_command("./scripts/check_kapp.py")
+    # Is it a terraform directory?
+    try:
+        files = os.listdir(step)
+        for afile in files:
+            if re.search("\\.tf", afile) is not None:
+                # I found a .tf file. So must be terraform
+                step_type = "terraform"
+                errors = run_terraform(step)
+                total_errors += errors
+                if errors > 0 and next_step_is_abort(steps, idx):
+                    pmsg.fail("This last terraform had errors. Aborting per the step file.")
+                    abort_exit = True
+                break
+        if step_type == "terraform":
+            continue
+    except:
+        pass
 
-###################### Next Step ########################
-# Check/install tanzu-standard package repo...
-total_errors += helper.run_a_command("./scripts/tanzu_package.py")
-
-###################### Next Step ########################
-# Run terraform for folders
-total_errors += run_terraform("terraform")
+    pmsg.notice("This step is ignored: " + step)
 
 ###################### Done ########################
 print ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
