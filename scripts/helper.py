@@ -6,8 +6,8 @@ import os
 import subprocess
 import pmsg
 import re
-import re
-
+import time
+#import pdb
 
 class helper():
     """
@@ -71,12 +71,10 @@ def check_for_result_for_a_time(command_and_args_list, expression, check_how_oft
 
     """
     found = False
-    for i in range(30):
-        if check_for_result(["tanzu", "package", "repository", "list", "-A"], expression):
+    for i in range(max_checks):
+        if check_for_result(command_and_args_list, expression):
             found = True
             break
         time.sleep(check_how_often)
 
-    if not found:
-        return False
-    return True
+    return found

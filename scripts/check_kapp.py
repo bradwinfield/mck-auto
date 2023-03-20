@@ -29,23 +29,21 @@ if not helper.check_for_result(["kubectl", "get", "psp"], '^tanzu-system-kapp-ct
 pmsg.green("Kapp PSP OK.")
 
 ### Now check for the Kapp Controller itself...
-if not helper.check_for_result(["kubectl", "get", "pods", "-n", "tkg-system"], 'kapp-controller.*\\s+Running'):
+if not helper.check_for_result(["kubectl", "get", "pods", "-n", "tkg-system"], 'kapp-controller-.*Running'):
     rc = helper.run_a_command("kubectl apply -f templates/kapp-controller.yaml")
     if rc != 0:
         pmsg.warning("Can't install the kapp controller.")
         exit(1)
 
-    # Double-check...
-    kapp_running = False
-    for i in range(10):
-        if helper.check_for_result(["kubectl", "get", "pods", "-n", "tkg-system"], 'kapp-controller.*\\s+Running'):
-            kapp_running = True
-            break
-        time.sleep(2)
-    if not kapp_running:
-        pmsg.fail("Kapp Controller pod not running.")
-        exit(1)
+# Check for kapp-controller running...
+kapp_running = helper.check_for_result_for_a_time(
+    ["kubectl", "get", "pods", "-n", "tkg-system"],
+    'kapp-controller-.*Running',
+    2,
+    10)
+if not kapp_running:
+    pmsg.fail("Kapp Controller pod not running.")
+    exit(1)
 
 pmsg.green("Kapp Controller OK.")
-    
 exit(0)
