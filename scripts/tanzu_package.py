@@ -6,13 +6,13 @@
 import helper
 import os
 import pmsg
-import pdb
+#import pdb
 
 tanzu_package_registry = os.environ["tanzu_package_registry"]
 tanzu_standard_package_repo_name = os.environ["tanzu_standard_package_repo_name"]
 tanzu_package_registry_version = os.environ["tanzu_package_registry_version"]
 repo = tanzu_standard_package_repo_name + ":" + tanzu_package_registry_version 
-pdb.set_trace()
+#pdb.set_trace()
 expression = tanzu_standard_package_repo_name + '.*' + tanzu_package_registry + '.*' + tanzu_package_registry_version + '.*Reconcile succeeded'
 
 if not helper.check_for_result(["tanzu", "package", "repository", "list", "-A"], expression):
