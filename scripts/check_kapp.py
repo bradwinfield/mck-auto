@@ -3,7 +3,6 @@
 import pmsg
 import helper
 import time
-import os
 
 # Check and install if not found, the kapp controller into the cluster.
 
@@ -45,5 +44,8 @@ if not kapp_running:
     pmsg.fail("Kapp Controller pod not running.")
     exit(1)
 
+# I'm adding a 10 second sleep here because I've noticed an error in subsequent steps
+# if we try too quickly to use kapp.
+time.sleep(10)
 pmsg.green("Kapp Controller OK.")
 exit(0)

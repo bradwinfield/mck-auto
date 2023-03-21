@@ -168,7 +168,7 @@ for idx, step in enumerate(steps):
         errors = helper.run_a_command(stepname)
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
-            pmsg.fail("This last script had errors. Aborting per the step file.")
+            pmsg.fail("This last script had errors.", steps[idx+1])
             abort_exit = True
         continue
 
@@ -182,7 +182,7 @@ for idx, step in enumerate(steps):
                 errors = run_terraform(step)
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):
-                    pmsg.fail("This last terraform had errors. Aborting per the step file.")
+                    pmsg.fail("This last terraform had errors.", steps[idx+1])
                     abort_exit = True
                 break
         if step_type == "terraform":
