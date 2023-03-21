@@ -6,6 +6,7 @@ import os
 import sys
 import yaml
 import re
+import getpass
 
 #import pdb
 # pdb.set_trace()
@@ -109,6 +110,11 @@ if dry_run:
 verbose_flag = ""
 if verbose:
     verbose_flag = " --verbose"
+
+# Prompt for password...
+pw = getpass.getpass(prompt="Password: ", stream=None)
+os.environ["vsphere_password"] = pw
+os.environ["tkg_user_password"] = pw
 
 # Read configuration file.
 if os.path.exists(args.config_file):

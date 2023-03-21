@@ -37,6 +37,7 @@ else:
             pmsg.green("The cert-manager is OK.")
         else:
             pmsg.fail("Failed to install the cert-manager. Check the logs.")
+            exit(1)
     else:
         pmsg.fail("The cert-manager package can't be found.")
         exit(1)
