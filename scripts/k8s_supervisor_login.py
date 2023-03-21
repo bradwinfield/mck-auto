@@ -13,6 +13,7 @@ os.environ["KUBECTL_VSPHERE_PASSWORD"] = os.environ["vsphere_password"]
 # Login to the k8s workload cluster
 command = "kubectl vsphere login --server " + supervisor_cluster + " --vsphere-username " + vsphere_username + " --insecure-skip-tls-verify"
 
+rc = 1
 if helper.run_a_command(command) == 0:
     # Connect to the context
     command = "kubectl config use-context " + vsphere_namespace
@@ -22,7 +23,6 @@ if helper.run_a_command(command) == 0:
         process = subprocess.Popen(["kubectl", "config", "get-contexts"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = process.communicate()
         contexts = output.splitlines()
-        rc = 1
         for context in contexts:
             if re.search("\\*\\s+"+vsphere_namespace+"\\s", context.decode('utf-8')) is not None:
                 rc = 0

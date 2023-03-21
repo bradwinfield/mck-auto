@@ -111,11 +111,6 @@ verbose_flag = ""
 if verbose:
     verbose_flag = " --verbose"
 
-# Prompt for password...
-pw = getpass.getpass(prompt="Password: ", stream=None)
-os.environ["vsphere_password"] = pw
-os.environ["tkg_user_password"] = pw
-
 # Read configuration file.
 if os.path.exists(args.config_file):
     with open(args.config_file, "r") as cf:
@@ -138,13 +133,13 @@ else:
 
 # Check Pre-requisites
 # 1. Need pyvmomi tools
-if "pyVmomi" in sys.modules:
-    dprint("pyVmomi tools found in sys.modules.")
-elif (spec := importlib.util.find_spec("pyVmomi")) is not None:
-    dprint("pyVmomi tools found using importlib.util.find_spec.")
-else:
-    pmsg.FAIL(" You need to install pyVmomi. See https://pypi.org/project/pyvmomi/ (or just run $ pip3 install --upgrade pyvmomi.)")
-    exit(1)
+#if "pyVmomi" in sys.modules:
+    #dprint("pyVmomi tools found in sys.modules.")
+#elif (spec := importlib.util.find_spec("pyVmomi")) is not None:
+    #dprint("pyVmomi tools found using importlib.util.find_spec.")
+#else:
+    #pmsg.FAIL(" You need to install pyVmomi. See https://pypi.org/project/pyvmomi/ (or just run $ pip3 install --upgrade pyvmomi.)")
+    #exit(1)
 
 ###################### Put all the config parameters into the environment ########################
 # Setup the environment with all the variables found in the configuration file.
@@ -153,6 +148,11 @@ for varname in configs:
         dprint("Putting " + str(varname) + " in the environment...")
         os.environ[varname] = configs[varname]
         os.environ["TF_VAR_"+varname] = configs[varname]
+
+# Prompt for password...
+pw = getpass.getpass(prompt="Password: ", stream=None)
+os.environ["vsphere_password"] = pw
+os.environ["tkg_user_password"] = pw
 
 ###################### Execute all the steps in order ########################
 abort_exit = False
@@ -174,7 +174,7 @@ for idx, step in enumerate(steps):
         errors = helper.run_a_command(stepname)
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
-            pmsg.fail("This last script had errors.", steps[idx+1])
+            pmsg.fail("This last script had errors." + steps[idx+1])
             abort_exit = True
         continue
 
