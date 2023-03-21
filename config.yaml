@@ -105,6 +105,7 @@ vip_network_interface: "eth0"
 tanzu_package_registry: "projects.registry.vmware.com/tkg/packages/standard/repo"
 tanzu_package_registry_version: "v1.6.1"
 tanzu_standard_package_repo_name: "tanzupackages"
+installed_packages_namespace: "tanzu-packages"
 
 # Define the additional variables for the Tanzu Kubernetes Cluster creation template
 #cp_vmclass_size = "<controlplane_vmclass_type>"

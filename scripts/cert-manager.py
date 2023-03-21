@@ -11,8 +11,9 @@
 import helper
 import pmsg
 import re
+import os
 
-package_namespace = "tanzu-packages"
+package_namespace = os.environ["installed_packages_namespace"]
 
 # Is cert-manager already running?
 if helper.check_for_result(["tanzu", "package", "installed", "list", "-A"], 'cert-manager.*Reconcile succeeded'):
