@@ -7,9 +7,11 @@ sudo apt update
 sudo apt install python3-pip -y
 sudo apt install git -y
 sudo apt install openssh-server -y
+sudo apt install curl -y
 
 echo "Adding python libraries needed for automation..."
 pip3 install pyVmomi
+pip3 install jinja2
 
 echo
 echo 'Get the CLI bundles (tanzu, kubectl, velero) from vmware.'
