@@ -12,6 +12,7 @@ root directory - Contains run_pipeline.py, config.yaml and steps.conf
 In order to run this code, you have to 
 1. Update the config.yaml - This contains all the variables needed to build up a TKGs cluster starting from vSphere 7.0.3
 2. Check the steps.conf - This file contains the list of steps (script names as found in the scripts subdirectory -OR- terrform subdirectory names) that will be run.
+3. Install python3 modules: yaml, jinja2, requests (pip3 install (modulename))
 
 After these two things are complete, run the following
 
