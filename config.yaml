@@ -135,3 +135,9 @@ infrastructure_provider: vsphere
 
 tkg_http_proxy_enabled: "false"
 tkg_ip_family: ipv4
+
+## Parameters to create the Custom storage class inside the TKC workload cluster
+custom_storage_class_name: "dsr-app-storage"
+storage_policy_name: "tanzu-sp"
+reclaimpolicy_type: "Retain"
+volumebindingmode: "WaitForFirstConsumer"
