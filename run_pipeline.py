@@ -8,7 +8,7 @@ import yaml
 import re
 import getpass
 
-#import pdb
+# import pdb
 # pdb.set_trace()
 sys.path.append(r'./scripts')
 import pmsg
@@ -37,7 +37,49 @@ def confirm_file(filename):
     return False
 
 
-def need_terraform_init():
+def add_to_environment(configs):
+    count = 0
+    for varname in configs:
+        if configs[varname] is not None:
+            dprint("Putting " + str(varname) + " in the environment...")
+            os.environ[varname] = configs[varname]
+            os.environ["TF_VAR_"+varname] = configs[varname]
+            count += 1
+    if count < 1:
+        return False
+    return True
+
+
+def read_yaml_config_file(filename):
+    # Read configuration file.
+    if os.path.exists(filename):
+        with open(filename, "r") as cf:
+            try:
+                configs = yaml.safe_load(cf)
+            except yaml.YAMLError as exc:
+                pmsg.fail(exc)
+                return False, None
+    else:
+        pmsg.fail("The config file does not exist. Please check the command line and try again.")
+        return False, None
+    return True, configs
+
+
+def add_environment_overrides():
+    return_code = False
+    if os.path.isfile(helper.env_override_file):
+        # Add lines to the environment
+        rc, configs = read_yaml_config_file(helper.env_override_file)
+        if rc:
+            if not add_to_environment(configs):
+                pmsg.fail("Can't add overrides to the environment.")
+
+        # Delete the environment override file so I don't apply at a later time.
+        os.remove(helper.env_override_file)
+    return return_code
+
+
+def run_terraform_init():
     if confirm_file("terraform.tfstate"):
         return False
     return True
@@ -64,7 +106,7 @@ def run_terraform(tfolder):
     if confirm_file("main.tf"):
         # run terraform init
         result = 0
-        if need_terraform_init():
+        if run_terraform_init():
             result = helper.run_a_command("terraform init")
         if result == 0:
             # run terrafor plan
@@ -98,10 +140,12 @@ parser.add_argument('-c', '--config_file', required=True, help='Name of yaml fil
 parser.add_argument('-s', '--steps_file', required=True, help='Name of steps file; what scripts will run this time.')
 parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
 parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose output.')
+parser.add_argument('-n', '--password_noprompt', default=False, action='store_true', required=False, help='Verbose output.')
 
 args = parser.parse_args()
 verbose = args.verbose
 dry_run = args.dry_run
+password_noprompt = args.password_noprompt
 
 dry_run_flag = ""
 if dry_run:
@@ -111,17 +155,11 @@ verbose_flag = ""
 if verbose:
     verbose_flag = " --verbose"
 
-# Read configuration file.
-if os.path.exists(args.config_file):
-    with open(args.config_file, "r") as cf:
-        try:
-            configs = yaml.safe_load(cf)
-        except yaml.YAMLError as exc:
-            pmsg.fail(exc)
-            exit (1)
-else:
-    pmsg.fail("The config file does not exist. Please check the command line and try again.")
-    exit(1)
+rc, configs = read_yaml_config_file(args.config_file)
+if not rc or configs is None:
+    pmsg.fail("Can't read the config file: " + args.config_file)
+    exit (1)
+
 
 # Read the steps file
 if os.path.exists(args.steps_file):
@@ -131,28 +169,21 @@ else:
     pmsg.fail("The steps file does not exist. Please check the command line and try again.")
     exit(1)
 
-# Check Pre-requisites
-# 1. Need pyvmomi tools
-#if "pyVmomi" in sys.modules:
-    #dprint("pyVmomi tools found in sys.modules.")
-#elif (spec := importlib.util.find_spec("pyVmomi")) is not None:
-    #dprint("pyVmomi tools found using importlib.util.find_spec.")
-#else:
-    #pmsg.FAIL(" You need to install pyVmomi. See https://pypi.org/project/pyvmomi/ (or just run $ pip3 install --upgrade pyvmomi.)")
-    #exit(1)
-
 ###################### Put all the config parameters into the environment ########################
 # Setup the environment with all the variables found in the configuration file.
-for varname in configs:
-    if configs[varname] is not None:
-        dprint("Putting " + str(varname) + " in the environment...")
-        os.environ[varname] = configs[varname]
-        os.environ["TF_VAR_"+varname] = configs[varname]
+if not add_to_environment(configs):
+    pmsg.fail("Can't add config file entries into the environment.")
+    exit(1)
+
 
 # Prompt for password...
-pw = getpass.getpass(prompt="Password: ", stream=None)
-os.environ["vsphere_password"] = pw
-os.environ["tkg_user_password"] = pw
+if not password_noprompt:
+    prompt_text = os.environ["vsphere_username"] + " password: "
+    pw1 = getpass.getpass(prompt=prompt_text, stream=None)
+    os.environ["vsphere_password"] = pw1
+    prompt_text = os.environ["tkg_user"] + " password: "
+    pw2 = getpass.getpass(prompt=prompt_text, stream=None)
+    os.environ["tkg_user_password"] = pw2
 
 ###################### Execute all the steps in order ########################
 abort_exit = False
@@ -176,7 +207,10 @@ for idx, step in enumerate(steps):
         if errors > 0 and next_step_is_abort(steps, idx):
             pmsg.fail("This last script had errors." + steps[idx+1])
             abort_exit = True
+        else:
+            add_environment_overrides()
         continue
+
 
     # Is it a terraform directory?
     try:

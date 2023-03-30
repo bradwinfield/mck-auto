@@ -15,6 +15,9 @@ class helper():
     """
 
 
+env_override_file = "/tmp/env_override_file"
+
+
 # ########################################################
 def __init__(self):
     pass
@@ -85,6 +88,22 @@ def check_for_result(command_and_args_list, expression):
         if re.search(expression, line.decode("utf-8")) is not None:
             return True
     return False
+
+def add_env_override(newfile, varname, value):
+    """ Create (if newfile=True) or add to the environment override file and put the varname and value in
+
+    Args:
+        newfile (Boolean): create a new override file if True. Otherwise just add a new line to it.
+        varname (string): name of environment variable to set (export).
+        value (string): value of variable.
+    :returns: Boolean - writing to envirnment override file success.
+    :rtype: Boolean
+    """
+    openflag = 'r'
+    if newfile:
+        openflag = 'w'
+    with open(env_override_file, openflag) as env_file:
+        env_file.write(varname + ": " + value + "\n")
 
 
 def check_for_result_for_a_time(command_and_args_list, expression, check_how_often, max_checks):
