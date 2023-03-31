@@ -1,29 +1,25 @@
 ---
 vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
-vsphere_password: "qBO2OA3Rf7e1X@leQdp"
+vsphere_password: "prompt"
 tkg_user: "tkg-admin"
 # Note that the password must conform to the vSphere user password policy.
-tkg_user_password: "qBO2OA3Rf7e1X@leQdp"
+tkg_user_password: "prompt"
 tkg_role: TKG
 cluster_name: vc01cl01
 cluster_plan: dev
 vsphere_namespace: "tkgs-ns1"
-#supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
-supervisor_cluster: "10.220.47.3"
-workload_cluster: "tkgs-workload2"
+vsphere_namespace_owner: "Administrator"
+vsphere_namespace_owner_domain: "vsphere.local"
+supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
+workload_cluster: "tkgs-workload"
 vsphere_datacenter: vc01
 storage_class: "vc01cl01-t0compute"
 datastore: "vsanDatastore"
-#datastores: [vsanDatastore]
 resource_pool: tkg-management-components
-#resource_pools: [tkg-management-components]
 vm_folder: tkg-management-components
-#vm_folders: [tkg-management-components] 
 network: "Avi Internal"
-#networks: ["Avi Internal"]
 distributed_switch: "vc01-dvs"
-#distributed_switches: [vc01-dvs]
 
 # Network settings for the Supervisor cluster...
 supervisor_distributed_port_group: esxi-mgmt
@@ -44,13 +40,14 @@ primary_workload_network_vsphere_portgroup_name: "user-workload"
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
 
-dns_servers: "10.79.2.5"
-#dns_servers: "10.220.136.2,10.220.136.3"
+dns_servers: "10.79.2.6"
 dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
-#ntp_servers: "time1.oc.vmware.com, time2.oc.vmware.com, time3.oc.vmware.com, time4.oc.vmware.com"
 content_library: "vc01cl01-wcp"
 
+#dns_servers: "10.220.136.2 10.220.136.3"
+#dns_servers: "10.220.136.3"
+#ntp_servers: "time1.oc.vmware.com, time2.oc.vmware.com, time3.oc.vmware.com, time4.oc.vmware.com"
 needed_privileges_file: needed_privileges.yaml
 
 tanzu_config_template: tanzu_cluster_template.yaml
@@ -108,7 +105,7 @@ avi_certificate: |
 # Complete these in order to complete the tanzu build template yaml...
 avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
 avi_username: "admin"
-avi_password: "qBO2OA3Rf7e1X@leQdp"
+avi_password: "prompt"
 
 # Unused below here
 avi_ca_data_b64: 

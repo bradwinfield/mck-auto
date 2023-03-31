@@ -7,7 +7,7 @@ import subprocess
 import pmsg
 import re
 import time
-#import pdb
+# import pdb
 
 class helper():
     """
@@ -65,7 +65,7 @@ def run_a_command_get_stdout(command_and_args_list):
         lines = output.splitlines()
         for line in lines:
             tlines.append(line.decode('utf-8').strip())
-            
+
     return tlines
 
 
@@ -90,7 +90,7 @@ def check_for_result(command_and_args_list, expression):
     return False
 
 def add_env_override(newfile, varname, value):
-    """ Create (if newfile=True) or add to the environment override file and put the varname and value in
+    """ Create (if newfile=True) or add to the environment override file and put the varname and value in it.
 
     Args:
         newfile (Boolean): create a new override file if True. Otherwise just add a new line to it.
@@ -99,7 +99,7 @@ def add_env_override(newfile, varname, value):
     :returns: Boolean - writing to envirnment override file success.
     :rtype: Boolean
     """
-    openflag = 'r'
+    openflag = 'a'
     if newfile:
         openflag = 'w'
     with open(env_override_file, openflag) as env_file:
@@ -109,13 +109,13 @@ def add_env_override(newfile, varname, value):
 def check_for_result_for_a_time(command_and_args_list, expression, check_how_often, max_checks):
     """
     Run a command with arguments and check the output for a specific string of text (regular expression) over a time period.
-    
+
     Args:
         command_and_args_list (list): Run this command with arguments and capture the output.
         expression (string): Split the result of the command into lines and see if any line matches this expression.
         check_how_often (int): check every <check_how_often> seconds for the expression.
         max_checks (int): check a maxiumum of this many times before giving up.
-        
+
     :returns: Boolean - Match or no match
     :rtype: Boolean
 

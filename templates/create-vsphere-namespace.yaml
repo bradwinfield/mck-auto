@@ -1,0 +1,46 @@
+---
+kind: wcpNamespace
+metadata:
+  vcenter: "{{ vsphere_server }}"
+  datacenter: "{{ vsphere_datacenter }}"
+  cluster: "{{ cluster_name }}"
+spec:
+  namespace: "{{ vsphere_namespace }}"
+  access_list:
+    - domain: {{ vsphere_namespace_owner_domain }}
+      role: OWNER
+      subject: {{ vsphere_namespace_owner }}
+      subject_type: USER
+  cluster: "{{ vsphere_cluster_id }}"
+  config_status: RUNNING
+  description: ''
+  messages: []
+  networks:
+    - {{ primary_workload_network_vsphere_portgroup_name }}
+  self_service_namespace: false
+  stats:
+    cpu_used: 0
+    memory_used: 0
+    storage_used: 0
+  storage_specs:
+    - policy: {{ storage_class }}
+  vm_service_spec:
+    content_libraries:
+      - {{ content_library_id }}
+    vm_classes:
+      - best-effort-large
+      - best-effort-medium
+      - guaranteed-2xlarge
+      - best-effort-2xlarge
+      - guaranteed-xsmall
+      - best-effort-small
+      - best-effort-8xlarge
+      - best-effort-xlarge
+      - guaranteed-4xlarge
+      - guaranteed-8xlarge
+      - guaranteed-small
+      - guaranteed-xlarge
+      - best-effort-4xlarge
+      - guaranteed-large
+      - guaranteed-medium
+      - best-effort-xsmall

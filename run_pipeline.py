@@ -7,6 +7,7 @@ import sys
 import yaml
 import re
 import getpass
+from datetime import datetime
 
 # import pdb
 # pdb.set_trace()
@@ -90,7 +91,6 @@ def next_step_is_abort(steps, idx):
         # last line. 
         return False
     if re.search('abort', steps[idx+1], re.IGNORECASE) is not None:
-        # next line must be 'Abort' so return True
         return True
     return False
 
@@ -160,6 +160,9 @@ if not rc or configs is None:
     pmsg.fail("Can't read the config file: " + args.config_file)
     exit (1)
 
+# First thing to add to the environment is the name of the config file...
+if not add_to_environment({"config_file": args.config_file, "steps_file": args.steps_file}):
+    pmsg.fail("Can't add the name of the config and steps files to the environment.")
 
 # Read the steps file
 if os.path.exists(args.steps_file):
@@ -178,15 +181,23 @@ if not add_to_environment(configs):
 
 # Prompt for password...
 if not password_noprompt:
-    prompt_text = os.environ["vsphere_username"] + " password: "
+    prompt_text = "vCenter Admin: " + os.environ["vsphere_username"] + " password: "
     pw1 = getpass.getpass(prompt=prompt_text, stream=None)
-    os.environ["vsphere_password"] = pw1
-    prompt_text = os.environ["tkg_user"] + " password: "
+
+    prompt_text = "TKG User: " + os.environ["tkg_user"] + " password: "
     pw2 = getpass.getpass(prompt=prompt_text, stream=None)
-    os.environ["tkg_user_password"] = pw2
+
+    prompt_text = "AVI " + os.environ["avi_username"] + " password: "
+    pw3 = getpass.getpass(prompt=prompt_text, stream=None)
+
+    add_to_environment({"vsphere_password": pw1, "tkg_user_password": pw2, "avi_password": pw3})
 
 ###################### Execute all the steps in order ########################
 abort_exit = False
+
+now = datetime.now()
+pmsg.blue("Pipeline starting at: " + str(now))
+
 for idx, step in enumerate(steps):
     step_type = ""
     if abort_exit:
@@ -202,6 +213,8 @@ for idx, step in enumerate(steps):
     if os.path.exists(stepname):
         # Must be a script...
         step_type = "script"
+        now = datetime.now()
+        pmsg.blue(str(now))
         errors = helper.run_a_command(stepname)
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
@@ -219,10 +232,12 @@ for idx, step in enumerate(steps):
             if re.search("\\.tf", afile) is not None:
                 # I found a .tf file. So must be terraform
                 step_type = "terraform"
+                now = datetime.now()
+                pmsg.blue(str(now))
                 errors = run_terraform(step)
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):
-                    pmsg.fail("This last terraform had errors.", steps[idx+1])
+                    pmsg.fail("This last terraform had errors. " + steps[idx+1])
                     abort_exit = True
                 break
         if step_type == "terraform":
@@ -230,12 +245,12 @@ for idx, step in enumerate(steps):
     except:
         pass
 
-    pmsg.notice("This step is ignored: " + step)
-
 ###################### Done ########################
 print ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 if total_errors > 0:
     pmsg.warning("Number of errors/warnings encountered: " + str(total_errors) + ".")
 else:
     pmsg.green("Success! There were no errors or warnings.")
-pmsg.blue ("Done.")
+
+now = datetime.now()
+pmsg.blue("Pipeline ending at: " + str(now))
