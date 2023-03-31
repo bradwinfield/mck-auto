@@ -36,6 +36,7 @@ os.environ["WCP_PASSWORD"] = os.environ["vsphere_password"]
 result = helper.run_a_command("./scripts/wcpctl.py apply " + wcpctl_config)
 if result == 0:
     # Check the namespace to see if it is ready...
+    time.sleep(10)
     for i in range(1, 10):
         if check_namespace_services_ready():
             rc = 0
