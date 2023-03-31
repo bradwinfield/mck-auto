@@ -7,14 +7,25 @@ import interpolate
 import pmsg
 import helper
 import os
+import time
+import re
 
 config_file = os.environ["config_file"]
 template = "templates/create-vsphere-namespace.yaml"
 wcpctl_config = "/tmp/wcpctl_config.yaml"
+vsphere_namespace = os.environ["vsphere_namespace"]
+vsphere_username = os.environ["vsphere_username"]
+rc = 1
+
+def check_namespace_services_ready():
+    lines = helper.run_a_command_get_stdout(["kubectl", "get", "all", "-n", vsphere_namespace])
+    for line in lines:
+        if not re.match('^NAME|^service\\S+\\s+LoadBalancer\\s+(\\d+\\.){3}\\d+\\s+(\\d+\\.){3}\\d+', line):
+            return False
+    return True
 
 # Interpolate...
 # add vsphere_owner_domain and vsphere_username_nodomain to environment...
-vsphere_username = os.environ["vsphere_username"]
 parts = vsphere_username.split('@')
 os.environ["vsphere_username_nodomain"] = parts[0]
 os.environ["vsphere_owner_domain"] = parts[1]
@@ -22,8 +33,15 @@ interpolate.interpolate_from_environment_to_template(template, wcpctl_config)
 
 # Run wcpctl.py
 os.environ["WCP_PASSWORD"] = os.environ["vsphere_password"]
-rc = helper.run_a_command("./scripts/wcpctl.py apply " + wcpctl_config)
-if rc != 0:
+result = helper.run_a_command("./scripts/wcpctl.py apply " + wcpctl_config)
+if result == 0:
+    # Check the namespace to see if it is ready...
+    for i in range(1, 10):
+        if check_namespace_services_ready():
+            rc = 0
+            break
+        time.sleep(10)
+else:
     pmsg.fail("Failed to create the vSphere namespace.")
 
 # Clean up first...

@@ -5,7 +5,7 @@ import re
 import subprocess
 import pmsg
 import time
-import pdb
+# import pdb
 
 supervisor_cluster = os.environ["supervisor_cluster"]
 vsphere_username = os.environ["vsphere_username"]
@@ -31,7 +31,6 @@ def try_to_login(command):
 
 def control_plane_ready():
     ready = True
-    pdb.set_trace()
 
     lines = helper.run_a_command_get_stdout(["kubectl", "get", "nodes"])
     for line in lines:
