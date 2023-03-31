@@ -46,3 +46,28 @@ def interpolate_from_yaml_to_template(yaml_source, template_file, output_file):
             if len(interpolated_string) > 1:
                 return True
     return False
+#########################################################
+def interpolate_from_environment_to_template(template_file, output_file):
+    """
+    Interpolate a template_file given variables and values from the environment.
+    Create a results output file interpolated.
+
+    :param template_file: String file name of the template file to interpolate yaml source values into.
+    :param output_file: String file name of the resulting file.
+    :returns: boolean - True, interpolation succeded.
+    :rtype: bool
+    """
+
+    interp_dict = os.environ
+
+    with open(template_file) as jt:
+        all_jt_lines = jt.read()
+        template = Template(all_jt_lines)
+        interpolated_string = template.render(interp_dict)
+
+        j = open(output_file, "w")
+        j.write(interpolated_string)
+        j.close()
+        if len(interpolated_string) > 1:
+            return True
+    return False

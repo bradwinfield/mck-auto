@@ -9,6 +9,14 @@ from pyVmomi import vim
 import pmsg
 
 def api_get(server, path, token):
+    """ Gets content in json format from a URL
+    :param server: vCenter server IP or FQDN
+    :param path: URL path to GET
+    :param token: The session token as returned by vcenter_api.vcenter_login()
+    :returns: Boolean
+    :rtype: bool
+    """
+
     header = {"vmware-api-session-id": token}
     url = "https://"+server+path
     response = requests.get(url, headers=header, verify=False)
@@ -19,6 +27,13 @@ def api_get(server, path, token):
     return json_obj
 
 def api_delete(server, path, token):
+    """ Calls the DELETE action to server/path
+    :param server: vCenter server IP or FQDN
+    :param path: URL path to DELETE
+    :param token: The session token as returned by vcenter_api.vcenter_login()
+    :returns: Boolean
+    :rtype: bool
+    """
     if not dry_run:
         header = {"vmware-api-session-id": token}
         url = "https://"+server+path
@@ -31,6 +46,15 @@ def api_delete(server, path, token):
     return True
 
 def api_post(server, path, token, data, success_code):
+    """ Calls the POST action to server/path with given data 
+    :param server: vCenter server IP or FQDN
+    :param path: URL path to DELETE
+    :param token: The session token as returned by vcenter_api.vcenter_login()
+    :param data: json formatted data to POST
+    :param success_code: HTTP return_code to expect. Anything else is treated as an error.
+    :returns: Boolean
+    :rtype: bool
+    """
     # Returns True or False
     header = {"vmware-api-session-id": token, "Content-Type": "application/json"}
     url = "https://"+server+path
@@ -46,7 +70,40 @@ def api_post(server, path, token, data, success_code):
     pmsg.warning ("Response: " + "api_post with data: " + str(data) + " returned status code: " + str(response.status_code))
     return False
 
+def api_post_returns_content(server, path, token, data, success_code):
+    """ Calls the POST action to server/path with given data and returns content
+    :param server: vCenter server IP or FQDN
+    :param path: URL path to DELETE
+    :param token: The session token as returned by vcenter_api.vcenter_login()
+    :param data: json formatted data to POST
+    :param success_code: HTTP return_code to expect. Anything else is treated as an error.
+    :returns: string
+    :rtype: string
+    """
+    # Returns response.content
+    header = {"vmware-api-session-id": token, "Content-Type": "application/json"}
+    url = "https://"+server+path
+    response = requests.post(url, headers=header, verify=False, json=data)
+
+    # Some posts don't return content
+    try:
+        json_obj = json.loads(response.content.decode())
+    except:
+        pass
+    if response.status_code == success_code:
+        return response.content
+    pmsg.warning ("Response: " + "api_post with data: " + str(data) + " returned status code: " + str(response.status_code))
+    return None
+
+
 def vcenter_login(server, username, pw):
+    """ Logs into the vCenter server
+    :param server: vCenter server IP or FQDN
+    :param username: User name
+    :param pw: Password
+    :returns: Session token
+    :rtype: string
+    """
     args = {'host': server, 'port': 443, 'user': username, 'password': pw, 'disable_ssl_verification': True}
     url = "https://" + server + "/rest/com/vmware/cis/session"
     creds = username + ":" + pw

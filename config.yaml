@@ -9,6 +9,8 @@ tkg_role: TKG
 cluster_name: vc01cl01
 cluster_plan: dev
 vsphere_namespace: "tkgs-ns1"
+vsphere_namespace_owner: "Administrator"
+vsphere_namespace_owner_domain: "vsphere.local"
 #supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
 supervisor_cluster: "10.220.47.3"
 workload_cluster: "tkgs-workload2"
@@ -44,8 +46,9 @@ primary_workload_network_vsphere_portgroup_name: "user-workload"
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
 
-dns_servers: "10.79.2.5"
-#dns_servers: "10.220.136.2,10.220.136.3"
+dns_servers: "10.79.2.6"
+#dns_servers: "10.220.136.2 10.220.136.3"
+#dns_servers: "10.220.136.3"
 dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 #ntp_servers: "time1.oc.vmware.com, time2.oc.vmware.com, time3.oc.vmware.com, time4.oc.vmware.com"
