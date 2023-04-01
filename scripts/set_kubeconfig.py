@@ -5,10 +5,11 @@
 import helper
 import os
 
-supervisor_cluster = os.environ["supervisor_cluster"]
+workload_cluster = os.environ["workload_cluster"]
+kubeconfig_dir = "/tmp/"+workload_cluster+"_kubeconfig"
+kubeconfig = kubeconfig_dir + "/config"
 
-kubeconfig_dir = "/tmp/"+supervisor_cluster+"_kubeconfig"
-helper.add_env_override(True, "KUBECONFIG", kubeconfig_dir)
+helper.add_env_override(True, "KUBECONFIG", kubeconfig)
 
 # Make sure the directory exists...
 if not os.path.exists(kubeconfig_dir):

@@ -25,7 +25,7 @@ pmsg.normal("Publishing Custom Storage class...")
 cmd = ['kubectl', 'apply', '-f', output_file]
 if helper.check_for_result(cmd,"storageclass.storage.k8s.io.* created") :
     if helper.check_for_result_for_a_time(["kubectl","get","sc",customsc,"-o","jsonpath='{.parameters.svStorageClass}'"],storagepolicy, 5, 5):
-        pmsg.green("!! StorageClass created successfully !!")   
+        pmsg.green("Storage class " + customsc + " OK.")   
     else: 
         pmsg.fail("Failed to create the storage class, check cluster events")
         exit(1)
