@@ -1,33 +1,16 @@
 ---
+# Distribution Center parameters - This section will be specific to a Distribution Center.
 vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "prompt"
-tkg_user: "tkg-admin"
-# Note that the password must conform to the vSphere user password policy.
-tkg_user_password: "prompt"
-tkg_role: TKG
-cluster_name: vc01cl01
-cluster_plan: dev
-vsphere_namespace: "tkgs-ns1"
-vsphere_namespace_owner: "Administrator"
-vsphere_namespace_owner_domain: "vsphere.local"
 supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
-workload_cluster: "tkgs-workload"
-vsphere_datacenter: vc01
-storage_class: "vc01cl01-t0compute"
-datastore: "vsanDatastore"
-resource_pool: tkg-management-components
-vm_folder: tkg-management-components
-network: "Avi Internal"
-distributed_switch: "vc01-dvs"
+vsphere_namespace: "atl1-tkgs-ns1"
+workload_cluster: "atl1-tkgs-workload"
 
 # Network settings for the Supervisor cluster...
-supervisor_distributed_port_group: esxi-mgmt
-supervisor_network_name: "esxi-mgmt"
 supervisor_network_starting_ip: "10.220.30.150"
 supervisor_network_subnet_mask: "255.255.255.224"
 supervisor_network_gateway_ip: "10.220.30.158"
-supervisor_network_static_address_count: "5"
 
 # Workload network
 primary_workload_network_static_gateway_ipv4: "10.220.47.62"
@@ -43,41 +26,10 @@ data_network_static_address_count: "11"
 dns_servers: "10.79.2.6"
 dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
-content_library: "vc01cl01-wcp"
 
-#dns_servers: "10.220.136.2 10.220.136.3"
-#dns_servers: "10.220.136.3"
-#ntp_servers: "time1.oc.vmware.com, time2.oc.vmware.com, time3.oc.vmware.com, time4.oc.vmware.com"
-needed_privileges_file: needed_privileges.yaml
-
-tanzu_config_template: tanzu_cluster_template.yaml
-tanzu_mc_config_filename: tanzu_mgmt_cluster.yaml
-
-cp_vmclass_size: "best-effort-medium"
-control_plane_count: "1"
-worker_node_count: "3"
-worker_vmclass_size: "best-effort-medium"
-ctrd_disksize: "25Gi"
-kubelet_disksize: "15Gi"
-tkr: "v1.22.9---vmware.1-tkg.1.cc71bc8"
-
-vsphere_control_plane_disk_gib: "40"
-vsphere_control_plane_endpoint: 
-vsphere_control_plane_mem_mib: "16384"
-vsphere_control_plane_num_cpus: "4"
-vsphere_insecure: "true"
-vsphere_worker_disk_gib: "40"
-vsphere_worker_mem_mib: "4096"
-vsphere_worker_num_cpus: "2"
-vip_network_interface: "eth0"
-
-tanzu_package_registry: "projects.registry.vmware.com/tkg/packages/standard/repo"
-tanzu_package_registry_version: "v1.6.1"
-tanzu_standard_package_repo_name: "tanzupackages"
-installed_packages_namespace: "tanzu-packages"
-
-certificate_email: "me@vmware.com"
-
+avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
+avi_username: "admin"
+avi_password: "prompt"
 avi_certificate: |
   -----BEGIN CERTIFICATE-----
   MIIDyzCCArOgAwIBAgIUWm5BrpRNRQFocULP5AxaPjPE854wDQYJKoZIhvcNAQEL
@@ -103,9 +55,48 @@ avi_certificate: |
   vTYonv7wt7qKhBaVWgkA
   -----END CERTIFICATE-----
 # Complete these in order to complete the tanzu build template yaml...
-avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
-avi_username: "admin"
-avi_password: "prompt"
+
+# #################################################################################
+# This section contains parameters that are the same for each Distribution Center...
+vsphere_namespace_owner: "Administrator"
+vsphere_namespace_owner_domain: "vsphere.local"
+content_library: "vc01cl01-wcp"
+
+tkg_user: "tkg-admin"
+tkg_user_password: "prompt"
+tkg_role: TKG
+cluster_name: vc01cl01
+
+vsphere_datacenter: vc01
+storage_class: "vc01cl01-t0compute"
+datastore: "vsanDatastore"
+distributed_switch: "vc01-dvs"
+
+supervisor_distributed_port_group: esxi-mgmt
+supervisor_network_name: "esxi-mgmt"
+supervisor_network_static_address_count: "5"
+
+
+tanzu_config_template: tanzu_cluster_template.yaml
+tanzu_mc_config_filename: tanzu_mgmt_cluster.yaml
+
+needed_privileges_file: needed_privileges.yaml
+
+cp_vmclass_size: "best-effort-medium"
+control_plane_count: "1"
+worker_node_count: "3"
+worker_vmclass_size: "best-effort-medium"
+ctrd_disksize: "25Gi"
+kubelet_disksize: "15Gi"
+tkr: "v1.22.9---vmware.1-tkg.1.cc71bc8"
+
+tanzu_package_registry: "projects.registry.vmware.com/tkg/packages/standard/repo"
+tanzu_package_registry_version: "v1.6.1"
+tanzu_standard_package_repo_name: "tanzupackages"
+installed_packages_namespace: "tanzu-packages"
+
+
+network: "Avi Internal"
 
 # Unused below here
 avi_ca_data_b64: 
@@ -138,3 +129,17 @@ custom_storage_class_name: "dsr-app-storage"
 storage_policy_name: "tanzu-sp"
 reclaimpolicy_type: "Retain"
 volumebindingmode: "WaitForFirstConsumer"
+
+######################################################################
+# Unused
+# vsphere_control_plane_disk_gib: "40"
+# vsphere_control_plane_endpoint: 
+# vsphere_control_plane_mem_mib: "16384"
+# vsphere_control_plane_num_cpus: "4"
+# vsphere_insecure: "true"
+# vsphere_worker_disk_gib: "40"
+# vsphere_worker_mem_mib: "4096"
+# vsphere_worker_num_cpus: "2"
+# vip_network_interface: "eth0"
+
+# certificate_email: "me@vmware.com"

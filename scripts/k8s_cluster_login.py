@@ -7,12 +7,13 @@ import pmsg
 
 os.environ["KUBECTL_VSPHERE_PASSWORD"] = os.environ["vsphere_password"]
 supervisor_cluster = os.environ["supervisor_cluster"]
+supervisor_cluster_vip = os.environ["supervisor_cluster_vip"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 workload_cluster = os.environ["workload_cluster"]
 
 # Login to the k8s workload cluster
-command = "kubectl vsphere login --server " + supervisor_cluster + " --vsphere-username " + vsphere_username + " --insecure-skip-tls-verify --tanzu-kubernetes-cluster-namespace " + vsphere_namespace + " --tanzu-kubernetes-cluster-name " + workload_cluster
+command = "kubectl vsphere login --server " + supervisor_cluster_vip + " --vsphere-username " + vsphere_username + " --insecure-skip-tls-verify --tanzu-kubernetes-cluster-namespace " + vsphere_namespace + " --tanzu-kubernetes-cluster-name " + workload_cluster
 rc = helper.run_a_command(command)
 
 if rc == 0:
