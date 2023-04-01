@@ -4,6 +4,7 @@ import helper
 import interpolate
 import pmsg
 import os
+import time
 
 yaml_source = os.environ["config_file"]
 template_file = "templates/workload-cluster-template.yaml"
@@ -12,21 +13,38 @@ interpolate.interpolate_from_yaml_to_template(yaml_source, template_file, output
 workload_cluster = os.environ["workload_cluster"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 
+
+def create_cluster(cmd):
+    # Tries to create a workload cluster.
+    # returns 0 on success
+    # returns 1 on failure
+    # returns 2 when you can try again.
+    
+    # Construct the kubectl apply command
+    if helper.check_for_result(cmd, "tanzukubernetescluster.* created"):
+        if helper.check_for_result_for_a_time(["kubectl", "get", "tkc", workload_cluster, "-n", vsphere_namespace, "-o", "jsonpath='{.status.phase}'"], "running", 60, 50):
+            pmsg.green("Workload cluster is RUNNING")
+            return 0
+        else:
+            pmsg.fail("Failed to create cluster in time, check logs for more details")
+            return 1
+    return 2
+
+
 # does this workload cluster already exist?
 if helper.run_a_command("kubectl get tkc " + workload_cluster + " -n " + vsphere_namespace) == 0:
     pmsg.green("Workload cluster is RUNNING")
     exit(0)
 
-# Construct the kubectl apply command
-pmsg.normal("Creating workload cluster...")
+# Try to create the workload cluster. I'm going to try several times if the yaml is not accepted.
 cmd = ['kubectl', 'apply', '-f', output_file]
-if helper.check_for_result(cmd, "tanzukubernetescluster.* created"):
-    if helper.check_for_result_for_a_time(["kubectl", "get", "tkc", workload_cluster, "-n", vsphere_namespace, "-o", "jsonpath='{.status.phase}'"], "running", 60, 50):
-        pmsg.green("Workload cluster is RUNNING")
-    else:
-        pmsg.fail("Failed to create cluster in time, check logs for more details")
+pmsg.normal("Creating workload cluster...")
+for i in range(1, 10):
+    rc = create_cluster(cmd)
+    if rc == 0:
+        exit(0)
+    if rc == 1:
         exit(1)
-else:
-    pmsg.fail ("Failed to apply the Cluster Create YAML")
-    exit(1)
-exit(0)
+    else:
+        time.sleep(30)
+        pmsg.normal("Try creating the workload cluster again...")
