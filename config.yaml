@@ -28,6 +28,10 @@ dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
 avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
+
+avi_vsphere_username: "avi-admin"
+avi_vsphere_password: "prompt"
+
 avi_username: "admin"
 avi_password: "prompt"
 avi_certificate: |

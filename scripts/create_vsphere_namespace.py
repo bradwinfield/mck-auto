@@ -14,7 +14,11 @@ config_file = os.environ["config_file"]
 template = "templates/create-vsphere-namespace.yaml"
 wcpctl_config = "/tmp/wcpctl_config.yaml"
 vsphere_namespace = os.environ["vsphere_namespace"]
-vsphere_username = os.environ["vsphere_username"]
+
+# The TKG user should be the one that performs this action...
+#vsphere_username = os.environ["vsphere_username"]
+vsphere_username = os.environ["tkg_user"]
+vsphere_password = os.environ["tkg_user_password"]
 rc = 1
 
 def check_namespace_services_ready():
@@ -32,7 +36,7 @@ os.environ["vsphere_owner_domain"] = parts[1]
 interpolate.interpolate_from_environment_to_template(template, wcpctl_config)
 
 # Run wcpctl.py
-os.environ["WCP_PASSWORD"] = os.environ["vsphere_password"]
+os.environ["WCP_PASSWORD"] = vsphere_password
 result = helper.run_a_command("./scripts/wcpctl.py apply " + wcpctl_config)
 if result == 0:
     # Check the namespace to see if it is ready...

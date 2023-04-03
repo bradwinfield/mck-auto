@@ -187,10 +187,13 @@ if not password_noprompt:
     prompt_text = "TKG User: " + os.environ["tkg_user"] + " password: "
     pw2 = getpass.getpass(prompt=prompt_text, stream=None)
 
-    prompt_text = "AVI " + os.environ["avi_username"] + " password: "
+    prompt_text = "AVI vSphere " + os.environ["avi_vsphere_username"] + " password: "
     pw3 = getpass.getpass(prompt=prompt_text, stream=None)
 
-    add_to_environment({"vsphere_password": pw1, "tkg_user_password": pw2, "avi_password": pw3})
+    prompt_text = "AVI " + os.environ["avi_username"] + " password: "
+    pw4 = getpass.getpass(prompt=prompt_text, stream=None)
+
+    add_to_environment({"vsphere_password": pw1, "tkg_user_password": pw2, "avi_vsphere_password": pw3, "avi_password": pw4})
 
 ###################### Execute all the steps in order ########################
 abort_exit = False

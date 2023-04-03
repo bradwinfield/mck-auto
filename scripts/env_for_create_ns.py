@@ -13,8 +13,10 @@ import helper
 
 # Get server and credentials from the environment...
 vsphere_server = os.environ["vsphere_server"]
-vsphere_username = os.environ["vsphere_username"]
-vsphere_password = os.environ["vsphere_password"]
+#vsphere_username = os.environ["vsphere_username"]
+#vsphere_password = os.environ["vsphere_password"]
+vsphere_username = os.environ["tkg_user"]
+vsphere_password = os.environ["tkg_user_password"]
 cluster_name = os.environ["cluster_name"]
 content_library = os.environ["content_library"]
 

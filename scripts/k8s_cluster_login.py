@@ -5,10 +5,12 @@ import re
 import subprocess
 import pmsg
 
-os.environ["KUBECTL_VSPHERE_PASSWORD"] = os.environ["vsphere_password"]
 supervisor_cluster = os.environ["supervisor_cluster"]
 supervisor_cluster_vip = os.environ["supervisor_cluster_vip"]
-vsphere_username = os.environ["vsphere_username"]
+#vsphere_username = os.environ["vsphere_username"]
+#os.environ["KUBECTL_VSPHERE_PASSWORD"] = os.environ["vsphere_password"]
+vsphere_username = os.environ["tkg_user"]
+os.environ["KUBECTL_VSPHERE_PASSWORD"] = os.environ["tkg_user_password"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 workload_cluster = os.environ["workload_cluster"]
 

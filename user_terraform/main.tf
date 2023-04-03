@@ -26,9 +26,9 @@ variable "tkg_role" {
   type        = string
   description = "TKG name."
 }
-variable "avi_username" {
+variable "avi_vsphere_username" {
   type        = string
-  description = "AVI Admin User name."
+  description = "AVI vSphere User name."
 }
 provider "vsphere" {
   user           = var.vsphere_username
@@ -48,7 +48,7 @@ data "vsphere_folder" "avi-se-folder" {
 }
 resource "vsphere_role" "tkg_admin_role" {
   name = var.tkg_role
-  role_privileges = ["Cns.Searchable", "Datastore.AllocateSpace", "Datastore.Browse", "Datastore.FileManagement", "Global.DisableMethods", "Global.EnableMethods", "Global.Licenses", "Network.Assign", "Resource.AssignVMToPool", "Sessions.GlobalMessage", "Sessions.ValidateSession", "StorageProfile.View", "VirtualMachine.Config.AddExistingDisk", "VirtualMachine.Config.AddNewDisk", "VirtualMachine.Config.AddRemoveDevice", "VirtualMachine.Config.AdvancedConfig", "VirtualMachine.Config.CPUCount", "VirtualMachine.Config.ChangeTracking", "VirtualMachine.Config.DiskExtend", "VirtualMachine.Config.EditDevice", "VirtualMachine.Config.Memory", "VirtualMachine.Config.RawDevice", "VirtualMachine.Config.RemoveDisk", "VirtualMachine.Config.Settings", "VirtualMachine.Interact.PowerOff", "VirtualMachine.Interact.PowerOn", "VirtualMachine.Inventory.CreateFromExisting", "VirtualMachine.Inventory.Delete", "VirtualMachine.Provisioning.DeployTemplate", "VirtualMachine.Provisioning.DiskRandomRead", "VirtualMachine.Provisioning.GetVmFiles", "VirtualMachine.State.CreateSnapshot", "VirtualMachine.State.RemoveSnapshot", "VApp.Import"]
+  role_privileges = ["Cns.Searchable", "Datastore.AllocateSpace", "Datastore.Browse", "Datastore.FileManagement", "Global.DisableMethods", "Global.EnableMethods", "Global.Licenses", "Namespaces.Manage", "Network.Assign", "Resource.AssignVMToPool", "Sessions.GlobalMessage", "Sessions.ValidateSession", "StorageProfile.View", "SupervisorServices.Manage", "VirtualMachine.Config.AddExistingDisk", "VirtualMachine.Config.AddNewDisk", "VirtualMachine.Config.AddRemoveDevice", "VirtualMachine.Config.AdvancedConfig", "VirtualMachine.Config.CPUCount", "VirtualMachine.Config.ChangeTracking", "VirtualMachine.Config.DiskExtend", "VirtualMachine.Config.EditDevice", "VirtualMachine.Config.Memory", "VirtualMachine.Config.RawDevice", "VirtualMachine.Config.RemoveDisk", "VirtualMachine.Config.Settings", "VirtualMachine.Interact.PowerOff", "VirtualMachine.Interact.PowerOn", "VirtualMachine.Inventory.CreateFromExisting", "VirtualMachine.Inventory.Delete", "VirtualMachine.Provisioning.DeployTemplate", "VirtualMachine.Provisioning.DiskRandomRead", "VirtualMachine.Provisioning.GetVmFiles", "VirtualMachine.State.CreateSnapshot", "VirtualMachine.State.RemoveSnapshot", "VApp.Import"]
 }
 resource "vsphere_role" "AviRole-Global" {
   name = "AviRole-Global"
@@ -66,13 +66,14 @@ resource "vsphere_entity_permissions" "tkg-and-avi-users-and-roles-to-cluster" {
   entity_id = data.vsphere_compute_cluster.cluster.id
   entity_type = "ClusterComputeResource"
   permissions {
-    user_or_group = "LOCAL.OS\\${var.tkg_user}"
+    #user_or_group = "LOCAL.OS\\${var.tkg_user}"
+    user_or_group = var.tkg_user
     propagate = true
     is_group = false
     role_id = vsphere_role.Modify-Cluster-Wide-Configurations.id
   }
   permissions {
-    user_or_group = "LOCAL.OS\\${var.avi_username}"
+    user_or_group = "LOCAL.OS\\${var.avi_vsphere_username}"
     propagate = true
     is_group = false
     role_id = vsphere_role.AviRole-Global.id
@@ -82,7 +83,7 @@ resource "vsphere_entity_permissions" "avi-user-folder-role-to-cluster" {
   entity_id = data.vsphere_folder.avi-se-folder.id
   entity_type = "Folder"
   permissions {
-    user_or_group = "LOCAL.OS\\${var.avi_username}"
+    user_or_group = "LOCAL.OS\\${var.avi_vsphere_username}"
     propagate = true
     is_group = false
     role_id = vsphere_role.AviRole-Folder.id
