@@ -53,8 +53,8 @@ username = os.environ["vsphere_username"]
 password = os.environ["vsphere_password"]
 tkg_user = os.environ["tkg_user"]
 tkg_user_password = os.environ["tkg_user_password"]
-avi_admin = os.environ["avi_username"]
-avi_password = os.environ["avi_password"]
+avi_vsphere_admin = os.environ["avi_vsphere_username"]
+avi_vsphere_password = os.environ["avi_vsphere_password"]
 
 token = vcenter_api.vcenter_login(server, username, password)
 if len(token) < 1:
@@ -64,16 +64,16 @@ dprint ("Session Token for REST API: " + token)
 
 exit_code = 0
 
-if check_vcenter_user(server, token, avi_admin, avi_password):
-    pmsg.green("AVI user " + avi_admin + " OK.")
+if check_vcenter_user(server, token, avi_vsphere_admin, avi_vsphere_password):
+    pmsg.green("AVI vSphere user " + avi_vsphere_admin + " OK.")
 else:
-    pmsg.fail("AVI user " + avi_admin + " not OK.")
+    pmsg.fail("AVI vSphere user " + avi_vsphere_admin + " not OK.")
     exit_code += 1
 
 if check_vcenter_user(server, token, tkg_user, tkg_user_password):
-    pmsg.green("TKG user " + tkg_user + " OK.")
+    pmsg.green("TKG vSphere user " + tkg_user + " OK.")
 else:
-    pmsg.fail("TKG user " + tkg_user + " not OK.")
+    pmsg.fail("TKG vSphere user " + tkg_user + " not OK.")
     exit_code += 1
 
 exit(exit_code)

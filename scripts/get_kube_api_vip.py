@@ -18,7 +18,7 @@ def get_kube_api_vip(api_endpoint, login):
             if "--kube-system-kube-apiserver-lb-svc" in vs["name"]:
                 for vip in vs["vip"]:
                     print(vip["ip_address"]["addr"])
-                    helper.add_env_override(True, "supervisor_cluster", vip["ip_address"]["addr"])
+                    helper.add_env_override(True, "supervisor_cluster_vip", vip["ip_address"]["addr"])
                     return True
     else:
         print("Error retrieving virtual services: ", response.text)
