@@ -3,8 +3,8 @@
 import vcenter_api
 import pmsg
 import argparse
-import yaml
 import os
+import helper
 
 def dprint(msg):
     if verbose:
@@ -33,7 +33,11 @@ def check_vcenter_user(server, token, username, password):
                 pmsg.underline ("https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.5/vmware-tanzu-kubernetes-grid-15/GUID-mgmt-clusters-vsphere.html#vsphere-permissions")
         else:
             pmsg.dry_run ("Not creating user: " + username + ".")
+    # Before returning, issue a govc command to make sure the user is in the Administrators group...
+    if helper.run_a_command("govc sso.group.update -a " + username + "@local.os Administrators") != 0:
+        pmsg.warning("Please check to see if the user: " + username + " is in the Administrators group.")
     return found_user
+
 
 ################################ Main #############################
 # setup args...
@@ -55,6 +59,11 @@ tkg_user = os.environ["tkg_user"]
 tkg_user_password = os.environ["tkg_user_password"]
 avi_vsphere_admin = os.environ["avi_vsphere_username"]
 avi_vsphere_password = os.environ["avi_vsphere_password"]
+
+os.environ["GOVC_URL"] = server
+os.environ["GOVC_USERNAME"] = username
+os.environ["GOVC_PASSWORD"] = password
+os.environ["GOVC_INSECURE"] = "true"
 
 token = vcenter_api.vcenter_login(server, username, password)
 if len(token) < 1:

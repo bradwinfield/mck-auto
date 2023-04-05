@@ -103,7 +103,7 @@ def add_env_override(newfile, varname, value):
     if newfile:
         openflag = 'w'
     with open(env_override_file, openflag) as env_file:
-        env_file.write(varname + ": " + value + "\n")
+        env_file.write(varname + ": \"" + value + "\"\n")
 
 
 def check_for_result_for_a_time(command_and_args_list, expression, check_how_often, max_checks):
