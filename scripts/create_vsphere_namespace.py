@@ -28,11 +28,10 @@ def check_namespace_services_ready():
             return False
     return True
 
+
 # Interpolate...
 # add vsphere_owner_domain and vsphere_username_nodomain to environment...
-parts = vsphere_username.split('@')
-os.environ["vsphere_username_nodomain"] = parts[0]
-os.environ["vsphere_owner_domain"] = parts[1]
+os.environ["vsphere_username_nodomain"] = vsphere_username
 interpolate.interpolate_from_environment_to_template(template, wcpctl_config)
 
 # Run wcpctl.py

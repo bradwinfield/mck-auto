@@ -90,7 +90,7 @@ def next_step_is_abort(steps, idx):
     if idx >= len(steps) - 1:
         # last line. 
         return False
-    if re.search('abort', steps[idx+1], re.IGNORECASE) is not None:
+    if re.match('abort', steps[idx+1], re.IGNORECASE) is not None:
         return True
     return False
 

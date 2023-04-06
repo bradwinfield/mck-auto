@@ -18,7 +18,6 @@ def check_vcenter_user(server, token, username, password):
 
     json_obj = vcenter_api.api_get(server, "/api/appliance/local-accounts/" + username, token)
     if json_obj is not None:
-        pmsg.green("User found.")
         found_user = True
     if not found_user:
         if not dry_run:
@@ -26,7 +25,7 @@ def check_vcenter_user(server, token, username, password):
             json_data = {"config": {"password": password, "roles": ["operator"] }, "username": username}
             rc = vcenter_api.api_post(server, "/api/appliance/local-accounts", token, json_data, 204)
             if rc:
-                pmsg.green ("User created.")
+                pmsg.green ("User " + username + " created.")
                 found_user = True
             else:
                 pmsg.fail ("I can't create the user: " + username + ". You may want to create it manually. Please check users/groups in vCenter and try again. See:")

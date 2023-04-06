@@ -13,14 +13,12 @@ interpolate.interpolate_from_yaml_to_template(yaml_source, template_file, output
 workload_cluster = os.environ["workload_cluster"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 
-
 def create_cluster(cmd):
     # Tries to create a workload cluster.
     # returns 0 on success
     # returns 1 on failure
     # returns 2 when you can try again.
-    
-    # Construct the kubectl apply command
+
     if helper.check_for_result(cmd, "tanzukubernetescluster.* created"):
         if helper.check_for_result_for_a_time(["kubectl", "get", "tkc", workload_cluster, "-n", vsphere_namespace, "-o", "jsonpath='{.status.phase}'"], "running", 60, 50):
             pmsg.green("Workload cluster is RUNNING")
