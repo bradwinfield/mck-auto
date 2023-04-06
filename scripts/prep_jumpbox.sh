@@ -85,3 +85,44 @@ echo "==================================== Installing 'kubectl' and the vsphere 
 unzip Downloads/vsphere-plugin.zip
 sudo install bin/kubectl /usr/local/bin/kubectl
 sudo install bin/kubectl-vsphere /usr/local/bin/kubectl-vsphere
+
+echo "==================================== Installing 'Terraform..."
+sudo apt-get update
+sudo apt-get install -y gnupg software-properties-common curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" --yes
+sudo apt-get update && sudo apt-get install -y terraform
+
+echo "==================================== Installing 'Golang..."
+sudo apt-get remove --auto-remove golang-go
+sudo rm -rvf /usr/local/go
+wget https://go.dev/dl/go1.20.2.linux-amd64.tar.gz -P Downloads
+sudo tar -xzvf Downloads/go1.20.2.linux-amd64.tar.gz -C Downloads
+sudo mv Downloads/go /usr/local
+echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+source ~/.bashrc
+go version
+echo "Go-lang Installed now"
+
+echo "==================================== Installing 'Govmomi..."
+mkdir Downloads/govmomi
+chmod +x Downloads/govmomi
+git clone https://github.com/vmware/govmomi.git Downloads/govmomi
+cd Downloads/govmomi/
+go get -u github.com/vmware/govmomi
+echo "Govmomi library is enabled" 
+echo "==================================== Installing 'govc..."
+go install github.com/vmware/govmomi/govc@latest 
+cd $HOME
+
+echo "==================================== Building the terraform-provider-namespace-management using GO ..."
+mkdir Downloads/terraform-provider-namespace-management
+chmod +x Downloads/terraform-provider-namespace-management
+# git clone https://github.com/mckesson/terraform-provider-namespace-management.git
+git clone https://e47y65j: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@github.com/mckesson/terraform-provider-namespace-management.git Downloads/terraform-provider-namespace-management
+cd Downloads/terraform-provider-namespace-management/
+go mod download github.com/a8m/tree
+go build -o terraform-provider-namespace-management
+cd $HOME
+echo "====== All the required tooling has been installed and configured on VSphere Tanzu Jumpbox..."
