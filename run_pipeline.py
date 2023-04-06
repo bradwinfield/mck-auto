@@ -90,7 +90,7 @@ def next_step_is_abort(steps, idx):
     if idx >= len(steps) - 1:
         # last line. 
         return False
-    if re.search('abort', steps[idx+1], re.IGNORECASE) is not None:
+    if re.match('abort', steps[idx+1], re.IGNORECASE) is not None:
         return True
     return False
 
@@ -140,12 +140,12 @@ parser.add_argument('-c', '--config_file', required=True, help='Name of yaml fil
 parser.add_argument('-s', '--steps_file', required=True, help='Name of steps file; what scripts will run this time.')
 parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
 parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose output.')
-parser.add_argument('-n', '--password_noprompt', default=False, action='store_true', required=False, help='Verbose output.')
+parser.add_argument('-n', '--pw_from_env', default=False, action='store_true', required=False, help='PWs from $password.')
 
 args = parser.parse_args()
 verbose = args.verbose
 dry_run = args.dry_run
-password_noprompt = args.password_noprompt
+password_noprompt = args.pw_from_env
 
 dry_run_flag = ""
 if dry_run:
@@ -180,7 +180,10 @@ if not add_to_environment(configs):
 
 
 # Prompt for password...
-if not password_noprompt:
+if password_noprompt:
+    pw = os.environ["password"]
+    add_to_environment({"vsphere_password": pw, "tkg_user_password": pw, "avi_vsphere_password": pw, "avi_password": pw})
+else:
     prompt_text = "vCenter Admin: " + os.environ["vsphere_username"] + " password: "
     pw1 = getpass.getpass(prompt=prompt_text, stream=None)
 

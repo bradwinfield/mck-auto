@@ -7,7 +7,7 @@ import interpolate
 import pmsg
 import os
 
-yaml_source = "config.yaml"
+yaml_source = os.environ["config_file"]
 template_file = "templates/custom_storage_class.yaml"
 output_file = "/tmp/sc_result"
 interpolate.interpolate_from_yaml_to_template(yaml_source, template_file, output_file)

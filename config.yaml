@@ -4,6 +4,16 @@ vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "prompt"
 supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
+
+# What is the vsphere cluster name?
+cluster_name: vc01cl01
+vsphere_datacenter: vc01
+storage_class: "vc01cl01-t0compute"
+datastore: "vsanDatastore"
+distributed_switch: "vc01-dvs"
+content_library: "vc01cl01-wcp"
+
+# Workload Management settings...
 vsphere_namespace: "atl1-tkgs-ns1"
 workload_cluster: "atl1-tkgs-workload"
 
@@ -28,12 +38,7 @@ dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
 avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
-
-avi_vsphere_username: "avi-admin"
-avi_vsphere_password: "prompt"
-
-avi_username: "admin"
-avi_password: "prompt"
+avi_network: "Avi Internal"
 avi_certificate: |
   -----BEGIN CERTIFICATE-----
   MIIDyzCCArOgAwIBAgIUWm5BrpRNRQFocULP5AxaPjPE854wDQYJKoZIhvcNAQEL
@@ -58,33 +63,28 @@ avi_certificate: |
   V1+Pm2MQM8upB3JXc+9UBJFwcCVU7VXG+8+OAT3iB6bw0k4DbkMuYu4GN3e3xqdi
   vTYonv7wt7qKhBaVWgkA
   -----END CERTIFICATE-----
-# Complete these in order to complete the tanzu build template yaml...
 
 # #################################################################################
 # This section contains parameters that are the same for each Distribution Center...
-vsphere_namespace_owner: "Administrator"
-vsphere_namespace_owner_domain: "vsphere.local"
-content_library: "vc01cl01-wcp"
+vsphere_namespace_owner: "tkg-admin"
+vsphere_namespace_owner_domain: "local.os"
 
 tkg_user: "tkg-admin"
 tkg_user_password: "prompt"
 tkg_role: TKG
-cluster_name: vc01cl01
 
-vsphere_datacenter: vc01
-storage_class: "vc01cl01-t0compute"
-datastore: "vsanDatastore"
-distributed_switch: "vc01-dvs"
+# AVI user in vSphere used to deploy AVI Controller and SEs...
+avi_vsphere_username: "avi-admin"
+avi_vsphere_password: "prompt"
+avi_role: "AVI"
+
+# Admin username inside the AVI system; Use this to get access in the AVI UI.
+avi_username: "admin"
+avi_password: "prompt"
 
 supervisor_distributed_port_group: esxi-mgmt
 supervisor_network_name: "esxi-mgmt"
 supervisor_network_static_address_count: "5"
-
-
-tanzu_config_template: tanzu_cluster_template.yaml
-tanzu_mc_config_filename: tanzu_mgmt_cluster.yaml
-
-needed_privileges_file: needed_privileges.yaml
 
 cp_vmclass_size: "best-effort-medium"
 control_plane_count: "1"
@@ -100,7 +100,6 @@ tanzu_standard_package_repo_name: "tanzupackages"
 installed_packages_namespace: "tanzu-packages"
 
 
-network: "Avi Internal"
 
 # Unused below here
 avi_ca_data_b64: 

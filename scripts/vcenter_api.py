@@ -8,6 +8,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from pyVmomi import vim
 import pmsg
 
+
+
 def api_get(server, path, token):
     """ Gets content in json format from a URL
     :param server: vCenter server IP or FQDN
@@ -34,15 +36,12 @@ def api_delete(server, path, token):
     :returns: Boolean
     :rtype: bool
     """
-    if not dry_run:
-        header = {"vmware-api-session-id": token}
-        url = "https://"+server+path
-        response = requests.delete(url, headers=header, verify=False)
-        if response.status_code > 299:
-            pmsg.fail ("Call to " + server + path + " Failed. Error occured in prepare-vsphere.pl: function api_delete.")
-            exit (2)
-    else:
-        pmsg.dry_run  ("Not deleting " + path + ".")
+    header = {"vmware-api-session-id": token}
+    url = "https://"+server+path
+    response = requests.delete(url, headers=header, verify=False)
+    if response.status_code > 299:
+        pmsg.fail ("Call to " + server + path + " Failed. Error occured in prepare-vsphere.pl: function api_delete.")
+        exit (2)
     return True
 
 def api_post(server, path, token, data, success_code):
