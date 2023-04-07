@@ -38,7 +38,16 @@ dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
 avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
-avi_network: "Avi Internal"
+#avi_network: "Avi Internal"
+avi_network: "esxi-mgmt"
+avi_subnet_mask: "255.255.255.224"
+avi_default_gateway: "10.220.30.158"
+avi_content_library: "AVI"
+avi_ova_name: "controller-22.1.3-9096"
+avi_vm_name1: "avi_01"
+avi_vm_ip1: "10.220.30.131"
+avi_vm_name2: "avi_02"
+avi_vm_name3: "avi_03"
 avi_certificate: |
   -----BEGIN CERTIFICATE-----
   MIIDyzCCArOgAwIBAgIUWm5BrpRNRQFocULP5AxaPjPE854wDQYJKoZIhvcNAQEL
@@ -77,10 +86,12 @@ tkg_role: TKG
 avi_vsphere_username: "avi-admin"
 avi_vsphere_password: "prompt"
 avi_role: "AVI"
+# UNUSED: avi_vsphere_resource_pool: "AVI"
 
 # Admin username inside the AVI system; Use this to get access in the AVI UI.
 avi_username: "admin"
 avi_password: "prompt"
+avi_resource_pool: "AVI"
 
 supervisor_distributed_port_group: esxi-mgmt
 supervisor_network_name: "esxi-mgmt"
