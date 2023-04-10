@@ -11,71 +11,65 @@ variable "avi_password" {
   sensitive = true
 }
 
-
-
-
-variable "vm_datacenter" {
+variable "vsphere_datacenter" {
   type    = string
   default = "vc01"
 }
 
-variable "vm_cluster" {
+variable "cluster_name" {
   type    = string
   default = "vc01cl01"
 }
 
-variable "esxi_vm_name" {
-  type    = string
-  default = "vesxi01"
-}
+#variable "esxi_vm_name" {
+#  type    = string
+#  default = "vesxi01"
+#}
 
-variable "vcenter_username" {
+variable "vsphere_username" {
   type = string
   default = "administrator@vsphere.local"
 }
 
-variable "vcenter_password" {
+variable "vsphere_password" {
   type = string
   default = ""
   sensitive = true
 }
 
-variable "vcenter_url" {
+variable "vsphere_server" {
   type = string
   # NOTE: Hostname ONLY, no protocol or path
   default = ""
 }
 
 
-
-// New variables for full OVA settings:-
-// TODO support multiple avi controllers
 variable "avi_management_hostname" {
   type = string
-  default = "avi-controller-1"
+  default = "avi_vm_name1"
 }
-variable "avi_management_domain" {
+variable "dns_search_domain" {
   type = string
   default = "example.com"
 }
-variable "avi_management_dns_server" {
+variable "dns_servers" {
   type = string
   default = "10.2.0.1"
 }
-variable "avi_management_dns_suffix" {
+variable "dns_search_domain" {
   type = string
   default = "example.com"
 }
 
-variable "avi_management_network_name" {
+variable "avi_network" {
   type    = string
   default = ""
 }
-variable "avi_management_ip_address" {
+variable "avi_vm_ip1" {
   type = string
   default = "10.2.0.50"
 }
-variable "avi_management_ip_network" {
+variable "avi_network_ip" {
   type = string
   default = "10.2.0.0"
 }

@@ -16,7 +16,7 @@ password = os.environ["vsphere_password"]
 tkg_user = os.environ["tkg_user"]
 tkg_role = os.environ["tkg_role"]
 tkg_role_id = os.environ["tkg_role_id"]
-avi_username = os.environ["avi_vsphere_username"]
+avi_vsphere_username = os.environ["avi_vsphere_username"]
 avi_role = os.environ["avi_role"]
 avi_role_id = os.environ["avi_role_id"]
 
@@ -65,10 +65,10 @@ else:
     pmsg.fail("Failed to add User/role " + tkg_user + "/" + tkg_role + " as a global permission.")
     exit(1)
 
-if add_user_to_global_permissions(session, full_url, avi_username, avi_role_id, nonce):
-    pmsg.green("User/role " + avi_username + "/" + avi_role + " global permission OK.")
+if add_user_to_global_permissions(session, full_url, avi_vsphere_username, avi_role_id, nonce):
+    pmsg.green("User/role " + avi_vsphere_username + "/" + avi_role + " global permission OK.")
 else:
-    pmsg.fail("Failed to add User/role " + avi_username + "/" + avi_role + " as a global permission.")
+    pmsg.fail("Failed to add User/role " + avi_vsphere_username + "/" + avi_role + " as a global permission.")
     exit(1)
 
 exit(0)
