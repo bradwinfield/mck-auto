@@ -4,8 +4,10 @@ import json
 import os
 import urllib3
 import helper
-urllib3.disable_warnings()
 import time
+
+urllib3.disable_warnings()
+
 
 def get_kube_api_vip(api_endpoint, login):
     # Send a GET request to the API endpoint to retrieve the list of virtual services
@@ -26,7 +28,10 @@ def get_kube_api_vip(api_endpoint, login):
 
 # ################################## Main ################################
 # Set up the API endpoint and authentication details
-server = os.environ["avi_controller_ip"]
+# If we have a DNS entry pre-created for AVI at this DC, then use this...
+#server = os.environ["avi_controller_ip"]
+# If not, use the IP address...
+server = os.environ["avi_floating_ip"]
 api_endpoint = "https://" + server
 avi_user = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
@@ -36,7 +41,6 @@ headers = {
     "Content-Type": "application/json",
 }
 #    "X-Avi-Version": "18.2.7",
-auth = (avi_user, avi_password)
 
 # Login and get session ID...
 login = requests.post(api_endpoint + "/login", verify=False, data={'username': 'admin', 'password': avi_password})
@@ -45,7 +49,9 @@ login = requests.post(api_endpoint + "/login", verify=False, data={'username': '
 #  terraform starts to create the supervisor cluster.
 for i in range(1, 30):
     if get_kube_api_vip(api_endpoint, login):
+        pmsg.green("Kube API VIP OK.")
         exit(0)
     time.sleep(60)    
 
+pmsg.fail("Can't find the kube API VIP from AVI.")
 exit(1)

@@ -13,6 +13,11 @@ import pmsg
 import time
 # import pdb
 
+# Did the VIP get set?
+if "supervisor_cluster_vip" not in os.environ.keys():
+    pmsg.fail("The VIP for the supervisor cluster VIP was not provided/found.")
+    exit(1)
+
 supervisor_cluster = os.environ["supervisor_cluster"]
 supervisor_cluster_vip = os.environ["supervisor_cluster_vip"]
 vsphere_namespace = os.environ["vsphere_namespace"]

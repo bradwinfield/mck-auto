@@ -18,7 +18,7 @@ vsphere_namespace: "atl1-tkgs-ns1"
 workload_cluster: "atl1-tkgs-workload"
 
 # Network settings for the Supervisor cluster...
-supervisor_network_starting_ip: "10.220.30.150"
+supervisor_network_starting_ip: "10.220.30.139"
 supervisor_network_subnet_mask: "255.255.255.224"
 supervisor_network_gateway_ip: "10.220.30.158"
 
@@ -33,45 +33,58 @@ primary_workload_network_vsphere_portgroup_name: "user-workload"
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
 
-dns_servers: "10.79.2.6"
+dns_servers: "10.220.136.2"
+#dns_servers: "10.79.2.6"
 dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
-avi_controller_ip: "avi01.h2o-75-9210.h2o.vmware.com"
+avi_controller_ip: "avi.h2o-75-9210.h2o.vmware.com"
 #avi_network: "Avi Internal"
 avi_network: "esxi-mgmt"
 avi_subnet_mask: "255.255.255.224"
-avi_network_ip: "10.220.30.128"
+avi_network_ip: "10.220.30.128/27"
 avi_default_gateway: "10.220.30.158"
 avi_content_library: "AVI"
 avi_ova_name: "controller-22.1.3-9096"
-avi_vm_name1: "avi_01"
+avi_vm_name1: "avi01"
 avi_vm_ip1: "10.220.30.131"
-avi_vm_name2: "avi_02"
-avi_vm_name3: "avi_03"
+avi_vm_name2: "avi02"
+avi_vm_ip2: "10.220.30.132"
+avi_vm_name3: "avi03"
+avi_vm_ip3: "10.220.30.133"
+avi_floating_ip: "10.220.30.134"
+# Leaving one IP open for the AVI Floating VIP
+avi_se_starting_ip: "10.220.30.135"
+avi_se_ending_ip: "10.220.30.136"
+
+# This cert is created when AVI is installed.
+# It is a system-standard-portal type in AVI and is used to access the AVI by terraform.
+# We will really want to supply a signed cert at some point.
 avi_certificate: |
   -----BEGIN CERTIFICATE-----
-  MIIDyzCCArOgAwIBAgIUWm5BrpRNRQFocULP5AxaPjPE854wDQYJKoZIhvcNAQEL
-  BQAwgYMxCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJDQTESMBAGA1UEBwwJUGFsbyBB
-  bHRvMQ8wDQYDVQQKDAZWTXdhcmUxDDAKBgNVBAsMA0gyTzEOMAwGA1UEAwwFYXZp
-  MDExJDAiBgkqhkiG9w0BCQEWFXBlenN1cHBvcnRAdm13YXJlLmNvbTAeFw0yMzAz
-  MjcxODE4MTlaFw0yNDAzMjYxODE4MTlaMIGDMQswCQYDVQQGEwJVUzELMAkGA1UE
-  CAwCQ0ExEjAQBgNVBAcMCVBhbG8gQWx0bzEPMA0GA1UECgwGVk13YXJlMQwwCgYD
-  VQQLDANIMk8xDjAMBgNVBAMMBWF2aTAxMSQwIgYJKoZIhvcNAQkBFhVwZXpzdXBw
-  b3J0QHZtd2FyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC8
-  gg1/R01hMpqEYE2BCXlgQFpU/Bc9C2obprlc4wjp3xnwHd0261AjRNZuAgWSLfuF
-  gt912NPHl2kjfXifNVQD+VXdXzLVVDs/5AkMkoP0rDOVcyaPYhehBiHgAnJAD1o+
-  quUS5ivHisNptSIecSPTaWTVdJnTij19sUvLQDdeEUrNHawCiOg/yKCVW2RUVZZM
-  0VsxcTd62079VCL1tT5y0sMNv0h/BD1PPVIGVywWm0+r9+BnUwQrtpUkN3J6Fq74
-  ZWnptcyh/uBmuL6umbr+YWvVyEPDY9OX/zJWocr0AxedXPcHJvFq5OrrjieRZ0Ix
-  EJhyZbDFv/lpESju58vNAgMBAAGjNTAzMDEGA1UdEQQqMCiCIGF2aTAxLmgyby03
-  NS05MjEwLmgyby52bXdhcmUuY29thwQK3B6CMA0GCSqGSIb3DQEBCwUAA4IBAQCv
-  4TMQFg6HrlFmDvHq5XHVsDXrIBGbudqMvSP3lrqY75b/AuESFZOlZWZ1DLugs/5j
-  bNVKn2iVwHrnvvW9HPLgUNuMT/ldKg5fH0MDLtZoKobJaScxim8sS+m/okH71NlR
-  WIAw0QJcRMBQIhP335YkDJncqur5qonAz0di/CrJ+8s1xV69K4OY5N6M38IkkXWW
-  xeeoMsryBxXh3asrkPuq4KGvVHINNnq5jmKkxNX/9YeQn8dsphtQNf794ZO/hNYm
-  V1+Pm2MQM8upB3JXc+9UBJFwcCVU7VXG+8+OAT3iB6bw0k4DbkMuYu4GN3e3xqdi
-  vTYonv7wt7qKhBaVWgkA
+  MIIEKDCCAxCgAwIBAgIUYxawQWIWeZXVemE7p3/amx6UZncwDQYJKoZIhvcNAQEL
+  BQAwgacxCzAJBgNVBAYTAlVTMQswCQYDVQQIDAJDQTERMA8GA1UEBwwIUGFsb0Fs
+  dG8xDzANBgNVBAoMBnZtd2FyZTEZMBcGA1UECwwQcGxhdGZvcm1zZXJ2aWNlczEn
+  MCUGA1UEAwweYXZpLmgyby03NS05MjEwLmgyby52bXdhcmUuY29tMSMwIQYJKoZI
+  hvcNAQkBFhRid2luZmllbGRAdm13YXJlLmNvbTAeFw0yMzA0MTIxNDE1MDBaFw0y
+  NDA0MTExNDE1MDBaMIGnMQswCQYDVQQGEwJVUzELMAkGA1UECAwCQ0ExETAPBgNV
+  BAcMCFBhbG9BbHRvMQ8wDQYDVQQKDAZ2bXdhcmUxGTAXBgNVBAsMEHBsYXRmb3Jt
+  c2VydmljZXMxJzAlBgNVBAMMHmF2aS5oMm8tNzUtOTIxMC5oMm8udm13YXJlLmNv
+  bTEjMCEGCSqGSIb3DQEJARYUYndpbmZpZWxkQHZtd2FyZS5jb20wggEiMA0GCSqG
+  SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDHFbSq9aQ0b4xWvZUBze/qi0QYJBmgEY4D
+  EqPlewkbLZQmDtAT2zS4XKAD0k0T/sLbX992IgIt9KuPlk/PW+6w+WTsUx6W0YbF
+  B1c/xiGS3zbKfOaQK3ZZQYWaVlZVNpfkR4Kgr3YC7d0FWj5UgoUBycTqNvMelBVS
+  450o++0/zeslvuNLmFTWE4T+vE5ZPm0Goy1+RRfrBnrtSOOClrzjD72SM7686Mwm
+  iyVnlUpcyvH2yNasiKRakfWRDY51E9wJBGmLUp/eAnBFcot4FBGgWO3ZNgKgE9/N
+  f+Obi2ABWmXqE9EEZJzulvLQ95rb7dG9+Wk3700QQyiU9G6zbZi5AgMBAAGjSjBI
+  MEYGA1UdEQQ/MD2HBArcHoOHBArcHoSHBArcHoWHBArcHoaCA2F2aYIeYXZpLmgy
+  by03NS05MjEwLmgyby52bXdhcmUuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQCnGYZm
+  5E0gfzrfVZ8Yf0oN8ZLW4DXdhwuvwBvWxy5uU6dHXRcHrpI4d4ZiAAp38WVyEq9G
+  tHHDk4dRbP2Y0IZT48gM6tl7UX9hmbV9Ym0JnqS1aWMW0wa1K9uhI9/hx/Y9SP7O
+  ekl9lB6HQhe4hmzdhFSINHbwgUX9SLhG0UKLPbKnN45AykxIzaSJf/LRmngLTMVS
+  Tb9S1vMT39k9k+SQt1xF4Yoyr81HoDsLjAHd4WoLfuCrCt+mzF3CQ2uS4FPC6XRO
+  kYaS4DXbW28ib0E7qQJa2WJjXVl4WZj4zYcr1LEYzhd6kHze/tTW7/rshcS+Np2V
+  x2YkLi649bVPJGJG
   -----END CERTIFICATE-----
 
 # #################################################################################
@@ -94,7 +107,7 @@ avi_username: "admin"
 avi_password: "prompt"
 avi_resource_pool: "AVI"
 
-supervisor_distributed_port_group: esxi-mgmt
+supervisor_distributed_port_group: "esxi-mgmt"
 supervisor_network_name: "esxi-mgmt"
 supervisor_network_static_address_count: "5"
 
