@@ -4,3 +4,5 @@
 
 rm -f user_terraform/*tfstate*
 rm -f wm_terraform/*tfstate*
+rm -f avi_controller_terraform/*tfstate*
+rm -f avi_config_terraform/*tfstate*
