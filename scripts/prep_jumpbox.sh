@@ -121,7 +121,9 @@ if [[ $? -ne 0 ]]; then
   echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
   echo "export GOPATH=$HOME/go" >> ~/.bashrc
 fi
-source ~/.bashrc
+export PATH=$PATH:/usr/local/go/bin
+export GOPATH=$HOME/go
+# source ~/.bashrc
 go version
 echo "Go-lang Installed now"
 
