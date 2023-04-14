@@ -29,7 +29,7 @@ variable "vsphere_datacenter" {
   default = "vc01"
 }
 
-variable "avi_resource_pool" {
+variable "avi_resource_pool_id" {
   type    = string
   default = ""
 }
@@ -58,13 +58,27 @@ variable "avi_ova_name" {
   type    = string
   default = ""
 }
-
 variable "avi_vm_name1" {
   type    = string
   default = ""
 }
-
 variable "avi_vm_ip1" {
+  type    = string
+  default = ""
+}
+variable "avi_vm_name2" {
+  type    = string
+  default = ""
+}
+variable "avi_vm_ip2" {
+  type    = string
+  default = ""
+}
+variable "avi_vm_name3" {
+  type    = string
+  default = ""
+}
+variable "avi_vm_ip3" {
   type    = string
   default = ""
 }

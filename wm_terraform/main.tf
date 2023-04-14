@@ -64,6 +64,10 @@ variable "avi_controller_ip" {
   type = string
   description = "IP Address of the AVI controller."
 }
+#variable "avi_floating_ip" {
+#  type = string
+#  description = "IP Address of the AVI controller."
+#}
 variable "avi_certificate" {
   type = string
   description = "AVI Certificate."
@@ -199,6 +203,7 @@ resource "namespace-management_cluster" "supervisor" {
   ephemeral_storage_policy_id = data.vsphere_storage_policy.sc.id
   load_balancer_provider = "AVI"
   load_balancer_id = var.cluster_name
+  # load_balancer_avi_host = var.avi_floating_ip
   load_balancer_avi_host = var.avi_controller_ip
   load_balancer_avi_ca_chain = var.avi_certificate
   load_balancer_avi_username = var.avi_username
