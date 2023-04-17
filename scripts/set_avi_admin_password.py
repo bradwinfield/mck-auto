@@ -7,18 +7,14 @@
 import requests
 import pmsg
 import urllib3
-import pdb
 
 urllib3.disable_warnings()
 
-# avi_user = os.environ["avi_username"]
-# avi_password = os.environ["avi_password"]
-# avi_vm_ip1 = os.environ["avi_vm_ip1"]
+avi_user = os.environ["avi_username"]
+avi_password = os.environ["avi_password"]
+avi_vm_ip1 = os.environ["avi_vm_ip1"]
 
-avi_user = "admin"
-avi_password = "qBO2OA3Rf7e1X@leQdp"
 default_avi_password = '58NFaGDJm(PJH0G'
-avi_vm_ip1 = "10.220.30.132"
 api_endpoint = "https://" + avi_vm_ip1
 
 def set_cookies(token, sid, avi_sid):
@@ -124,9 +120,7 @@ path = "/api/useraccount"
 headers["Content-Type"] = "application/json;charset=UTF-8"
 headers["Accept"] = "application/json"
 headers["referer"] = api_endpoint + "/login"
-data = {"username": "admin", "password": avi_password, "old_password": default_avi_password}
-pdb.set_trace()
-#response = requests.put(api_endpoint + path, headers=headers, data=data, cookies=next_cookie, verify=False)
+data = str({"username": "admin", "password": avi_password, "old_password": default_avi_password}).replace("'",'"')
 response = requests.put(api_endpoint + path, headers=headers, data=data, cookies=login_response.cookies, verify=False)
 if response.status_code > 299:
     pmsg.fail("Can't change the default admin password in AVI. Recommend manual operation. HTTP: " + str(response.status_code))

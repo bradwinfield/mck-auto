@@ -3,7 +3,6 @@
 import os
 import json
 import requests
-import pdb
 import pmsg
 import urllib3
 urllib3.disable_warnings()
@@ -48,6 +47,7 @@ def get_ha_data(current_config, avi_vm_ip1, avi_vm_ip2, avi_vm_ip3, avi_floating
 
     return json_put_data
 
+
 avi_floating_ip = os.environ["avi_floating_ip"]
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
 avi_vm_ip2 = os.environ["avi_vm_ip2"]
@@ -60,36 +60,42 @@ avi_password = os.environ["avi_password"]
 
 # Login and get session ID...
 login = requests.post(api_endpoint + "/login", verify=False, data={'username': 'admin', 'password': avi_password})
-if login.status_code != 200:
-    pmsg.fail("Can't login to " + api_endpoint)
+if login.status_code > 299:
+    pmsg.fail("Can't login to " + api_endpoint + ". HTTP Status Code: " + str(login.status_code) + ". " + login.text)
     exit(1)
 
 # What is the current configuration?
 path = "/api/cluster"
 # response = requests.get(api_endpoint + path, verify=False, cookies=dict(sessionid= login.cookies['sessionid']))
 response = requests.get(api_endpoint + path, verify=False, cookies=login.cookies)
-if response.status_code != 200:
-    pmsg.fail("Can't get cluster config from: " + api_endpoint)
+if response.status_code > 299:
+    pmsg.fail("Can't get cluster config from: " + api_endpoint + ". HTTP Status Code: " + str(login.status_code) + ". " + login.text)
     exit(1)
 
-pdb.set_trace()
-# Parse the response and retrieve the current configuration
+# If the current configuration includes all three of the AVI controllers,
+# then we are done.
 current_config = json.loads(response.text)
+if len(current_config["nodes"]) == 3:
+    pmsg.green("AVI HA OK.")
+    pmsg.normal("Nodes in AVI cluster are: " + current_config["nodes"][0]["ip"]["addr"] + ", " + current_config["nodes"][1]["ip"]["addr"] + ", " + current_config["nodes"][2]["ip"]["addr"])
+    exit(0)
+
+# Parse the response and retrieve the current configuration
 if len(current_config["nodes"]) < 2:
     # Turn on HA mode
-    data = get_ha_data(current_config, avi_vm_ip1, avi_vm_ip2, avi_vm_ip3, avi_floating_ip)
-    headers={
-        'X-CSRFToken': login.cookies['csrftoken'],
-        'Referer': api_endpoint,
+    data = str(get_ha_data(current_config, avi_vm_ip1, avi_vm_ip2, avi_vm_ip3, avi_floating_ip)).replace("'",'"')
+    headers = {
+        "Referer": api_endpoint + "/api/cluster",
         "Content-Type": "application/json",
         "Accept-Encoding": "application/json",
+        "X-CSRFToken": login.cookies["csrftoken"],
         "X-Avi-Version": "22.1.3"
         }
 
     # Send it back via http PUT...
     response = requests.put(api_endpoint + path, verify=False, data=data, headers=headers, cookies=login.cookies)
-    if response.status_code != 200:
-        pmsg.fail("Can't turn on HA mode in AVI. HTTP Error: " + str(response.status_code))
+    if response.status_code > 299:
+        pmsg.fail("Can't turn on HA mode in AVI. HTTP Error: " + str(response.status_code) + ". " + response.text)
         exit(1)
 
 exit(0)
