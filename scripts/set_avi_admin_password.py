@@ -5,6 +5,7 @@
 import requests
 # import os
 import pdb
+import pmsg
 # import re
 # import http.cookiejar
 import urllib3
@@ -50,7 +51,11 @@ def get_next_cookie(response):
 # 1. do a GET to the csrftoken...
 print("STEP 1 - get token #############################")
 pdb.set_trace()
-response = requests.get(api_endpoint + "/", verify=False)
+path = "/"
+response = requests.get(api_endpoint + path, verify=False)
+if response.status_code > 299:
+    pmsg.fail("Can't get the csrftoken on inital call to the AVI api. HTTP: " + str(response.status_code))
+    exit(1)
 pdb.set_trace()
 next_cookie = get_next_cookie(response)
 token = get_token(response)
@@ -58,7 +63,7 @@ token = get_token(response)
 ###################################################
 # 2. do a GET to initial-data?include_name&treat_expired_session_as_unauthenticated=true
 print("STEP 2 initial-data?include_name&treat_expired_session_as_unauthenticated=true ###############")
-# https://10.220.30.132/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true
+path = "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true"
 headers = {
     "Content-Type": "application/json",
     "x-csrftoken": token,
@@ -67,45 +72,64 @@ headers = {
 }
 #    "x-avi-tenant": "admin"
 
-response = requests.post(api_endpoint + "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true", verify=False, cookies=next_cookie)
-# response = requests.post(api_endpoint + "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true", headers=headers, verify=False, cookies=next_cookie)
-# response = requests.post(api_endpoint + "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true", headers=headers, verify=False, cookies=response.cookies)
+response = requests.get(api_endpoint + path, verify=False, cookies=next_cookie)
+if response.status_code > 299:
+    pmsg.fail("Can't get config data from AVI api. HTTP: " + str(response.status_code))
+    exit(1)
 next_cookie = get_next_cookie(response)
 token = get_token(response)
 
 ###################################################
 # 3. do a POST to login with the default password...
-print("STEP 2 login with default pw. #############################")
-# https://10.220.30.132/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true
+print("STEP 3 login with default pw. #############################")
+path = "/login?include_name=true"
 headers = {
     "Content-Type": "application/json",
     "x-csrftoken": token,
     "x-avi-version": "22.1.3",
     "x-avi-useragent": "UI"
 }
-#    "x-avi-tenant": "admin"
 
-#data = { "username": "admin", "password": default_avi_password }
+data = { "username": "admin", "password": default_avi_password }
 
-# response = requests.post(api_endpoint + "/login?include_name=true", headers=headers, verify=False, cookies=next_cookie)
-response = requests.post(api_endpoint + "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true", headers=headers, verify=False, cookies=response.cookies)
+response = requests.post(api_endpoint + path, headers=headers, data=data, verify=False, cookies=next_cookie)
+if response.status_code > 299:
+    pmsg.fail("Can't login to AVI. HTTP: " + str(response.status_code))
+    exit(1)
 next_cookie = get_next_cookie(response)
 token = get_token(response)
 
 ###################################################
-# 3. do a GET to get inital data and invalidate the session...
-print("STEP 3 get initial data and unauthenticate the session. #############################")
-response = requests.put(api_endpoint + "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true", cookies=next_cookie)
+# 4. do a GET to get inital data and invalidate the session...
+print("STEP 4 get initial data and unauthenticate the session. #############################")
+path = "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true"
+response = requests.get(api_endpoint + path, headers={'X-CSRFToken': response.cookies['csrftoken'], 'Referer': api_endpoint}, cookies=next_cookie)
+if response.status_code > 299:
+    pmsg.fail("Can't get config data from AVI. HTTP: " + str(response.status_code))
+    exit(1)
 next_cookie = get_next_cookie(response)
 token = get_token(response)
 
-#data = {"username": avi_user, "password": avi_password}
+###################################################
+# 5.
+print("STEP 5 Switch tenant. #############################")
+path = "/api/switch-to-tenant?tenant_name=admin"
+response = requests.get(api_endpoint + path, headers={'X-CSRFToken': response.cookies['csrftoken'], 'Referer': api_endpoint}, cookies=next_cookie)
+if response.status_code > 299:
+    pmsg.fail("Can't get config data from AVI. HTTP: " + str(response.status_code))
+    exit(1)
+next_cookie = get_next_cookie(response)
+token = get_token(response)
 
-#url = "https://" + avi_vm_ip1 + "/login?include_name=true&username=admin&password=" + avi_password
-#url = "https://" + avi_vm_ip1 + "/login?include_name=true"
-# Set up the HTTP headers and authentication token
-
-# POST...
-#response = requests.post(url, verify=False, cookies=cookies_dict, data=data)
+###################################################
+# 8. do a PUT to change the default admin password...
+print("STEP 8 Change default admin password. ################################")
+path = "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true"
+response = requests.put(api_endpoint + path, headers={'X-CSRFToken': response.cookies['csrftoken'], 'Referer': api_endpoint}, cookies=next_cookie)
+if response.status_code > 299:
+    pmsg.fail("Can't change the default admin password in AVI. HTTP: " + str(response.status_code))
+    exit(1)
+next_cookie = get_next_cookie(response)
+token = get_token(response)
 
 exit(0)
