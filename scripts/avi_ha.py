@@ -61,7 +61,7 @@ avi_password = os.environ["avi_password"]
 # Login and get session ID...
 login = requests.post(api_endpoint + "/login", verify=False, data={'username': 'admin', 'password': avi_password})
 if login.status_code != 200:
-    pmsg.fail("Can't login to ", api_endpoint)
+    pmsg.fail("Can't login to " + api_endpoint)
     exit(1)
 
 # What is the current configuration?

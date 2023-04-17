@@ -38,6 +38,17 @@ def confirm_file(filename):
     return False
 
 
+def exit_with_messages(total_errors):
+    pmsg.normal ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+    if total_errors > 0:
+        pmsg.warning("Number of errors/warnings encountered: " + str(total_errors) + ".")
+    else:
+        pmsg.green("Success! There were no errors or warnings.")
+
+    now = datetime.now()
+    pmsg.blue("Pipeline ending at: " + str(now))
+    exit(total_errors)
+
 def add_to_environment(configs):
     count = 0
     for varname in configs:
@@ -213,6 +224,11 @@ for idx, step in enumerate(steps):
     if re.search("^\\s*#|^\\s*$", step) is not None:
         continue
 
+    # If step is an "exit", then exit.
+    if re.match("exit", step, re.IGNORECASE):
+        pmsg.normal("Step processing stopping now due to 'exit' statement in step file.")
+        exit_with_messages(total_errors)
+
     # What kind of step is this?
     # Is it a script?
     stepname = "./scripts/" + step.strip()
@@ -252,11 +268,4 @@ for idx, step in enumerate(steps):
         pass
 
 ###################### Done ########################
-print ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
-if total_errors > 0:
-    pmsg.warning("Number of errors/warnings encountered: " + str(total_errors) + ".")
-else:
-    pmsg.green("Success! There were no errors or warnings.")
-
-now = datetime.now()
-pmsg.blue("Pipeline ending at: " + str(now))
+exit_with_messages(total_errors)
