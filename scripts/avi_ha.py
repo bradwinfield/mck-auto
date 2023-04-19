@@ -69,7 +69,7 @@ path = "/api/cluster"
 # response = requests.get(api_endpoint + path, verify=False, cookies=dict(sessionid= login.cookies['sessionid']))
 response = requests.get(api_endpoint + path, verify=False, cookies=login.cookies)
 if response.status_code > 299:
-    pmsg.fail("Can't get cluster config from: " + api_endpoint + ". HTTP Status Code: " + str(login.status_code) + ". " + login.text)
+    pmsg.fail("Can't get cluster config from: " + api_endpoint + path + ". HTTP Status Code: " + str(response.status_code) + ". " + response.text)
     exit(1)
 
 # If the current configuration includes all three of the AVI controllers,

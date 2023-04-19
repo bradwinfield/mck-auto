@@ -10,9 +10,11 @@ import helper
 import pmsg
 import re
 import os
+import interpolate
 
 package_namespace = os.environ["installed_packages_namespace"]
 values_file = "templates/fluent-bit-default-values.yaml"
+completed_values_file = "/tmp/fluent-bit-default-values.yaml"
 
 # Is fluent-bit already running?
 if helper.check_for_result(["tanzu", "package", "installed", "list", "-A"], 'fluent-bit.*Reconcile succeeded'):
@@ -29,10 +31,16 @@ else:
                 found_cm = True
 
     if found_cm:
-        helper.run_a_command_list(["tanzu", "package", "install", "fluent-bit", "--package-name", "fluent-bit.tanzu.vmware.com", "--values-file", values_file, "--namespace", package_namespace, "--version", fb_version, "--create-namespace"])
+        # Interpolate values file...
+        interpolate.interpolate_from_environment_to_template(values_file, completed_values_file)
+        helper.run_a_command_list(["tanzu", "package", "install", "fluent-bit", "--package-name", "fluent-bit.tanzu.vmware.com", "--values-file", completed_values_file, "--namespace", package_namespace, "--version", fb_version, "--create-namespace"])
+
         # Run the command to check for reconciliation complete...
         print("Checking for reconcile...")
-        if helper.check_for_result_for_a_time(["tanzu", "package", "installed", "list", "-A"], 'fluent-bit.*Reconcile succeeded', 10, 36):
+        reconciled = helper.check_for_result_for_a_time(["tanzu", "package", "installed", "list", "-A"], 'fluent-bit.*Reconcile succeeded', 10, 36)
+        # clean-up completed values file...
+        os.remove(completed_values_file)
+        if reconciled:
             pmsg.green("The fluent-bit is OK.")
         else:
             pmsg.fail("Failed to install fluent-bit. Check the logs.")

@@ -4,6 +4,7 @@
 #
 # Additional variables needed but not found in config.yaml are:
 # - content_library_id
+# - avi_content_library_id
 
 import os
 import vcenter_api
@@ -17,6 +18,7 @@ vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
 cluster_name = os.environ["cluster_name"]
 content_library = os.environ["content_library"]
+avi_content_library = os.environ["avi_content_library"]
 
 token = vcenter_api.vcenter_login(vsphere_server, vsphere_username, vsphere_password)
 
@@ -30,8 +32,19 @@ apipath = "/api/content/library?action=find"
 data = {"name": content_library}
 bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
 if bstring is not None:
-    vsphere_cluster_id = bstring.decode('utf-8').strip('[]"')
-    helper.add_env_override(False, "content_library_id", vsphere_cluster_id)
+    content_library_id = bstring.decode('utf-8').strip('[]"')
+    helper.add_env_override(True, "content_library_id", content_library_id)
 else:
-    pmsg:fail("Can't find the content library.")
+    pmsg.fail("Can't find the content library.")
     exit(1)
+
+data = {"name": avi_content_library}
+bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
+if bstring is not None:
+    avi_content_library_id = bstring.decode('utf-8').strip('[]"')
+    helper.add_env_override(False, "avi_content_library_id", avi_content_library_id)
+else:
+    pmsg.fail("Can't find the AVI content library.")
+    exit(1)
+
+exit(0)
