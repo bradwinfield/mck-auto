@@ -24,8 +24,9 @@ def get_token(response):
 
 avi_user = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
-avi_floating_ip = os.environ["avi_floating_ip"]
-api_endpoint = "https://" + avi_floating_ip
+#avi_ip = os.environ["avi_floating_ip"]
+avi_ip = os.environ["avi_vm_ip1"]
+api_endpoint = "https://" + avi_ip
 
 ############################## login ##############################
 login = requests.post(api_endpoint + "/login", verify=False, data={'username': avi_user, 'password': avi_password})
@@ -61,6 +62,11 @@ path = "/api/config-audit/tier/ESSENTIALS"
 response = requests.get(api_endpoint + path, verify=False, cookies=dict(sessionid=login.cookies['sessionid']))
 if response.status_code == 200:
     pmsg.normal("AVI License check complete.")
+    obj = json.loads(response.content)
+    #print(json.dumps(obj))
+    if obj["config_licensing_status"] != "passed":
+        pmsg.fail("The audit failed so I can't change the license to ESSENTIALS")
+        exit(1)
 else:
     pmsg.fail("Can't run the config audit in prep for ESSENTIALS license. HTTP: " + str(response.status_code) + "; " + response.text)
     exit(1)
