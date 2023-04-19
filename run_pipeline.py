@@ -232,14 +232,12 @@ for idx, step in enumerate(steps):
     # What kind of step is this?
     # Is it a script?
     stepname = "./scripts/" + step.strip()
-    step_ran = False
     if os.path.exists(stepname):
         # Must be a script...
         step_type = "script"
         now = datetime.now()
         pmsg.blue(str(now))
         errors = helper.run_a_command(stepname)
-        step_ran = True
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
             pmsg.fail("This last script had errors." + steps[idx+1])
@@ -258,7 +256,6 @@ for idx, step in enumerate(steps):
                 step_type = "terraform"
                 now = datetime.now()
                 pmsg.blue(str(now))
-                step_ran = True
                 errors = run_terraform(step)
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):
@@ -270,7 +267,5 @@ for idx, step in enumerate(steps):
     except:
         pass
 
-    if not step_ran:
-        pmsg.fail("Failed to run step: " + step + " Please check your step file? Misspelled script name?")
 ###################### Done ########################
 exit_with_messages(total_errors)
