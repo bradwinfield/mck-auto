@@ -7,12 +7,16 @@
 import requests
 import pmsg
 import urllib3
+import os
 
 urllib3.disable_warnings()
 
 avi_user = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
+avi_floating_ip = os.environ["avi_floating_ip"]
+dns_servers = os.environ["dns_servers"]
+dns_search_domain = os.environ["dns_search_domain"]
 
 default_avi_password = '58NFaGDJm(PJH0G'
 api_endpoint = "https://" + avi_vm_ip1
@@ -127,5 +131,174 @@ if response.status_code > 299:
     exit(1)
 next_cookie = get_next_cookie(response, token)
 token = get_token(response)
+###################################################
+# 9. Create/Enter a passphrase...
+print("STEP 9 Create a passphrase")
+path = "/api/macrostack"
+headers["Content-Type"] = "application/json;charset=UTF-8"
+headers["Accept"] = "application/json"
+headers["referer"] = api_endpoint + "/"
+payload = {
+    "data": [
+        {
+            "data": {
+                "url": "https://10.220.30.134/api/backupconfiguration/backupconfiguration-dd61aa76-0553-4dbe-80bf-3f66683199bd#Backup-Configuration",
+                "uuid": "backupconfiguration-dd61aa76-0553-4dbe-80bf-3f66683199bd",
+                "name": "Backup-Configuration",
+                "tenant_ref": "https://10.220.30.134/api/tenant/admin#admin",
+                "save_local": True,
+                "maximum_backups_stored": 4,
+                "remote_file_transfer_protocol": "SCP",
+                "backup_passphrase": avi_password
+            },
+            "method": "PUT",
+            "model_name": "backupconfiguration"
+        },
+        {
+            "data": {
+                "url": "https://" + avi_floating_ip + "/api/systemconfiguration",
+                "uuid": "default",
+                "dns_configuration": {
+                    "server_list": [
+                        {
+                            "addr": dns_servers,
+                            "type": "V4"
+                        }
+                    ],
+                    "search_domain": dns_search_domain
+                }
+            },
+            "method": "PUT",
+            "model_name": "systemconfiguration"
+        }
+    ]
+}
+data = str(payload).replace("'", '"')
+response = requests.post(api_endpoint + path, headers=headers, data=data, cookies=login_response.cookies, verify=False)
+if response.status_code > 299:
+    pmsg.fail("Can't change the default admin password in AVI. Recommend manual operation. HTTP: " + str(response.status_code))
+    exit(1)
+next_cookie = get_next_cookie(response, token)
+token = get_token(response)
+'''
+data_orig = {
+  "data": [
+    {
+      "data": {
+        "url": "https://10.220.30.134/api/backupconfiguration/backupconfiguration-dd61aa76-0553-4dbe-80bf-3f66683199bd#Backup-Configuration",
+        "uuid": "backupconfiguration-dd61aa76-0553-4dbe-80bf-3f66683199bd",
+        "name": "Backup-Configuration",
+        "tenant_ref": "https://10.220.30.134/api/tenant/admin#admin",
+        "_last_modified": "1681845986736247",
+        "save_local": True,
+        "maximum_backups_stored": 4,
+        "remote_file_transfer_protocol": "SCP",
+        "backup_passphrase": "qBO2OA3Rf7e1X@leQdp"
+      },
+      "method": "PUT",
+      "model_name": "backupconfiguration"
+    },
+    {
+      "data": {
+        "url": "https://10.220.30.134/api/systemconfiguration",
+        "uuid": "default",
+        "_last_modified": "1681845985469008",
+        "dns_configuration": {
+          "server_list": [
+            {
+              "addr": "10.220.136.2",
+              "type": "V4"
+            }
+          ],
+          "search_domain": "h2o-75-9210.h2o.vmware.com"
+        },
+        "ntp_configuration": {
+          "ntp_servers": [
+            {
+              "server": {
+                "addr": "0.us.pool.ntp.org",
+                "type": "DNS"
+              }
+            },
+            {
+              "server": {
+                "addr": "1.us.pool.ntp.org",
+                "type": "DNS"
+              }
+            },
+            {
+              "server": {
+                "addr": "2.us.pool.ntp.org",
+                "type": "DNS"
+              }
+            },
+            {
+              "server": {
+                "addr": "3.us.pool.ntp.org",
+                "type": "DNS"
+              }
+            }
+          ],
+          "ntp_server_list": [],
+          "ntp_authentication_keys": []
+        },
+        "portal_configuration": {
+          "enable_https": True,
+          "redirect_to_https": True,
+          "enable_http": True,
+          "use_uuid_from_input": false,
+          "enable_clickjacking_protection": True,
+          "allow_basic_authentication": false,
+          "password_strength_check": True,
+          "disable_remote_cli_shell": false,
+          "disable_swagger": false,
+          "api_force_timeout": 24,
+          "minimum_password_length": 8,
+          "sslkeyandcertificate_refs": [
+            "https://10.220.30.134/api/sslkeyandcertificate/sslkeyandcertificate-b0b072aa-70e5-423d-a17e-1a0490330643#System-Default-Portal-Cert",
+            "https://10.220.30.134/api/sslkeyandcertificate/sslkeyandcertificate-6160adce-f59c-425b-8a57-d0fe83c91a0f#System-Default-Portal-Cert-EC256"
+          ],
+          "sslprofile_ref": "https://10.220.30.134/api/sslprofile/sslprofile-da1dd6ac-de09-4d99-9b21-48e15299a3a5#System-Standard-Portal"
+        },
+        "global_tenant_config": {
+          "tenant_vrf": false,
+          "se_in_provider_context": True,
+          "tenant_access_to_provider_se": True
+        },
+        "email_configuration": {
+          "smtp_type": "SMTP_NONE"
+        },
+        "docker_mode": false,
+        "ssh_ciphers": [
+          "aes128-ctr",
+          "aes256-ctr"
+        ],
+        "ssh_hmacs": [
+          "hmac-sha2-512-etm@openssh.com",
+          "hmac-sha2-256-etm@openssh.com",
+          "hmac-sha2-512"
+        ],
+        "default_license_tier": "ENTERPRISE_WITH_CLOUD_SERVICES",
+        "secure_channel_configuration": {
+          "sslkeyandcertificate_refs": [
+            "https://10.220.30.134/api/sslkeyandcertificate/sslkeyandcertificate-2d22c75d-c95d-4de1-9608-be80cc93dff4#System-Default-Secure-Channel-Cert"
+          ]
+        },
+        "welcome_workflow_complete": false,
+        "fips_mode": false,
+        "enable_cors": false,
+        "common_criteria_mode": false,
+        "host_key_algorithm_exclude": "",
+        "kex_algorithm_exclude": "",
+        "mgmt_ip_access_control": {},
+        "linux_configuration": {}
+      },
+      "method": "PUT",
+      "model_name": "systemconfiguration"
+    }
+  ]
+}
+
+'''
 
 exit(0)
