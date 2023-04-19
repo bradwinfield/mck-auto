@@ -11,7 +11,6 @@ import urllib3
 import os
 import time
 import json
-import pdb
 
 urllib3.disable_warnings()
 
@@ -46,7 +45,6 @@ headers = {
 ############################# Check current license tier #######################
 path = "/api/systemconfiguration/?include_name=true&join=admin_auth_configuration.remote_auth_configurations.auth_profile_ref"
 response = requests.get(api_endpoint + path, verify=False, cookies=dict(sessionid=login.cookies['sessionid']))
-pdb.set_trace()
 if response.status_code == 200:
     json_obj = json.loads(response.content)
     if json_obj["default_license_tier"] == "ESSENTIALS":

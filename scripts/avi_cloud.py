@@ -9,6 +9,7 @@ import urllib3
 urllib3.disable_warnings()
 
 # Configures the Default-Cloud if not already configured.
+# Needs avi_content_library_id: run step "env_for_library_id.py" before this step.
 
 avi_floating_ip = os.environ["avi_floating_ip"]
 avi_vsphere_username = os.environ["avi_vsphere_username"]
@@ -48,7 +49,6 @@ if current_config["results"][0]["vtype"] == "CLOUD_NONE":
     # Set the cloud type to vCenter...
     reconfigure = True
 
-# current_config["results"][0]["license_tier"] = "ESSENTIALS"
 current_config["results"][0]["vtype"] = "CLOUD_VCENTER"
 current_config["results"][0]["vcenter_configuration"] = {
     "datacenter": vsphere_datacenter,
@@ -56,6 +56,7 @@ current_config["results"][0]["vcenter_configuration"] = {
     "privilege": "WRITE_ACCESS",
     "username": avi_vsphere_username,
     "vcenter_url": vsphere_server,
+    "use_content_lib": "false",
 #    "content_lib": {
 #      "name": avi_content_library,
 #      "id": avi_content_library_id
@@ -72,7 +73,7 @@ headers = {
 }
 
 uuid = current_config["results"][0]["uuid"]
-put_url = api_endpoint + path + "/" + uuid
+put_url = api_endpoint + path + "/" + uuid + "?include_name"
 # Send it back via http POST...
 data = str(current_config["results"][0]).replace("'", '"').replace(" False,", " false,").replace(" True,", " true,")
 pdb.set_trace()
