@@ -144,9 +144,7 @@ cd $HOME
 echo "==================================== Building the terraform-provider-namespace-management using GO ..."
 rm -rf Downloads/terraform-provider-namespace-management
 cd Downloads
-#chmod +x Downloads/terraform-provider-namespace-management
-# git clone https://github.com/mckesson/terraform-provider-namespace-management.git
-git clone https://e47y65j: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@github.com/mckesson/terraform-provider-namespace-management.git
+git clone https://github.com/vmware-tanzu-labs/terraform-provider-namespace-management.git
 cd terraform-provider-namespace-management/
 go mod download github.com/a8m/tree
 go build -o terraform-provider-namespace-management

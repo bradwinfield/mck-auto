@@ -39,12 +39,12 @@ dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
 avi_controller_ip: "avi.h2o-75-9210.h2o.vmware.com"
-#avi_network: "Avi Internal"
+#avi_network: "avi Internal"
 avi_network: "esxi-mgmt"
 avi_subnet_mask: "255.255.255.224"
 avi_network_ip: "10.220.30.128/27"
 avi_default_gateway: "10.220.30.158"
-avi_content_library: "AVI"
+avi_content_library: "avi"
 avi_ova_name: "controller-22.1.3-9096"
 avi_vm_name1: "avi01"
 avi_vm_ip1: "10.220.30.131"
@@ -56,7 +56,7 @@ avi_floating_ip: "10.220.30.134"
 # Leaving one IP open for the AVI Floating VIP
 avi_se_starting_ip: "10.220.30.135"
 avi_se_ending_ip: "10.220.30.136"
-avi_content_library: "AVI"
+avi_content_library: "avi"
 
 # This cert is created when AVI is installed.
 # It is a system-standard-portal type in AVI and is used to access the AVI by terraform.
@@ -93,18 +93,18 @@ vsphere_namespace_owner_domain: "local.os"
 
 tkg_user: "tkg-admin"
 tkg_user_password: "prompt"
-tkg_role: TKG
+tkg_role: tkg
 
 # AVI user in vSphere used to deploy AVI Controller and SEs...
 avi_vsphere_username: "avi-admin"
 avi_vsphere_password: "prompt"
-avi_role: "AVI"
-# UNUSED: avi_vsphere_resource_pool: "AVI"
+avi_role: "avi"
+# UNUSED: avi_vsphere_resource_pool: "avi"
 
 # Admin username inside the AVI system; Use this to get access in the AVI UI.
 avi_username: "admin"
 avi_password: "prompt"
-avi_resource_pool: "AVI"
+avi_resource_pool: "avi"
 
 supervisor_distributed_port_group: "esxi-mgmt"
 supervisor_network_name: "esxi-mgmt"
