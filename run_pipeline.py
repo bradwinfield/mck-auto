@@ -239,7 +239,7 @@ for idx, step in enumerate(steps):
         break
 
     # Ignore comment/empty lines..match.
-    if re.search("^\\s*#|^\\s*$", step) is not None:
+    if re.search("^\\s*#|^\\s*$|^abort", step, re.IGNORECASE) is not None:
         continue
 
     # If step is an "exit", then exit.
