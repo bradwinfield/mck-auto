@@ -120,9 +120,11 @@ echo $PATH | grep -qE '.usr.local.go.bin'
 if [[ $? -ne 0 ]]; then
   echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
   echo "export GOPATH=$HOME/go" >> ~/.bashrc
+  echo "export PATH=$PATH:$GOPATH/bin" >> ~/.bashrc
 fi
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
 # source ~/.bashrc
 go version
 echo "Go-lang Installed now"
@@ -130,7 +132,8 @@ echo "Go-lang Installed now"
 echo "==================================== Installing 'Govmomi..."
 mkdir Downloads/govmomi
 chmod +x Downloads/govmomi
-git clone https://github.com/vmware/govmomi.git Downloads/govmomi
+#git clone https://github.com/vmware/govmomi.git Downloads/govmomi
+git clone https://github.com/adamfowleruk/govmomi.git Downloads/govmomi
 cd Downloads/govmomi/
 go get -u github.com/vmware/govmomi
 echo "Govmomi library is enabled" 
@@ -139,13 +142,18 @@ go install github.com/vmware/govmomi/govc@latest
 cd $HOME
 
 echo "==================================== Building the terraform-provider-namespace-management using GO ..."
-mkdir Downloads/terraform-provider-namespace-management
-chmod +x Downloads/terraform-provider-namespace-management
+rm -rf Downloads/terraform-provider-namespace-management
+cd Downloads
+#chmod +x Downloads/terraform-provider-namespace-management
 # git clone https://github.com/mckesson/terraform-provider-namespace-management.git
-git clone https://e47y65j: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@github.com/mckesson/terraform-provider-namespace-management.git Downloads/terraform-provider-namespace-management
-cd Downloads/terraform-provider-namespace-management/
+git clone https://e47y65j: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@github.com/mckesson/terraform-provider-namespace-management.git
+cd terraform-provider-namespace-management/
 go mod download github.com/a8m/tree
 go build -o terraform-provider-namespace-management
+echo "WARNING: Change the Makefile OS_ARCH to linux_amd64 before proceeding."
+mv Makefile orig_Makefile
+cat orig_Makefile | sed 's/OS_ARCH=darwin_amd64/OS_ARCH=linux_amd64/' > Makefile
+make install
 cd $HOME
 echo "====== All the required tooling has been installed and configured on VSphere Tanzu Jumpbox..."
 

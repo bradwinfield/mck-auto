@@ -12,7 +12,8 @@ import re
 
 config_file = os.environ["config_file"]
 template = "templates/create-vsphere-namespace.yaml"
-wcpctl_config = "/tmp/wcpctl_config.yaml"
+site_name = os.environ["site_name"]
+wcpctl_config = "/tmp/" + site_name + "-wcpctl_config.yaml"
 vsphere_namespace = os.environ["vsphere_namespace"]
 
 # The TKG user should be the one that performs this action...

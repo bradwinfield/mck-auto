@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-# Deletes the tfstate files in user_terraform and wm_terraform
+# Deletes the tfstate files in all terraform (site_terraform)
+declare -a tdirs=("user_terraform" "wm_terraform" "avi_controller_terraform" "avi_config_terraform")
 
-rm -f user_terraform/*tfstate*
-rm -f wm_terraform/*tfstate*
-rm -f avi_controller_terraform/*tfstate*
-rm -f avi_config_terraform/*tfstate*
+for dir in "${tdirs[@]}"
+do
+    rm -f site_terraform/$site_name/$dir/*tfstate*
+    rm -rf site_terraform/$site_name/$dir/.terraform*
+    rm -rf site_terraform/$site_name/$dir/*.tfplan
+done

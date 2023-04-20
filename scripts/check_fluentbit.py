@@ -13,8 +13,9 @@ import os
 import interpolate
 
 package_namespace = os.environ["installed_packages_namespace"]
+site_name = os.environ["site_name"]
 values_file = "templates/fluent-bit-default-values.yaml"
-completed_values_file = "/tmp/fluent-bit-default-values.yaml"
+completed_values_file = "/tmp/" + site_name + "-fluent-bit-default-values.yaml"
 
 # Is fluent-bit already running?
 if helper.check_for_result(["tanzu", "package", "installed", "list", "-A"], 'fluent-bit.*Reconcile succeeded'):

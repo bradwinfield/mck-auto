@@ -7,10 +7,10 @@ import sys
 import yaml
 import re
 import getpass
+import shutil
+import stat
 from datetime import datetime
 
-# import pdb
-# pdb.set_trace()
 sys.path.append(r'./scripts')
 import pmsg
 import helper
@@ -105,6 +105,21 @@ def next_step_is_abort(steps, idx):
         return True
     return False
 
+def site_terraform(tfolder, vsphere_server):
+    # parse vsphere_server to get the site name
+    site_name = re.split('\.', vsphere_server)[0]
+    site_dir = "site_terraform/" + site_name
+    terraform_dir = site_dir + "/" + tfolder
+    # if the site_dir does not exist, create it
+    if not os.path.isdir(site_dir):
+        os.mkdir(site_dir)
+        os.chmod(site_dir, stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
+    if not os.path.isdir(terraform_dir):
+        # and copy in the tfolder (template) tf files...
+        shutil.copytree(tfolder, terraform_dir)
+        os.chmod(terraform_dir, stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
+    # return the site_dir
+    return terraform_dir
 
 def run_terraform(tfolder):
     exit_code = 1
@@ -189,6 +204,9 @@ if not add_to_environment(configs):
     pmsg.fail("Can't add config file entries into the environment.")
     exit(1)
 
+site_name = re.split('\.', configs["vsphere_server"])[0]
+if not add_to_environment({"site_name": site_name}):
+    pmsg.fail("Can't add the site name to the environment.")
 
 # Prompt for password...
 if password_noprompt:
@@ -229,6 +247,7 @@ for idx, step in enumerate(steps):
         pmsg.normal("Step processing stopping now due to 'exit' statement in step file.")
         exit_with_messages(total_errors)
 
+    ran_step = False
     # What kind of step is this?
     # Is it a script?
     stepname = "./scripts/" + step.strip()
@@ -238,6 +257,7 @@ for idx, step in enumerate(steps):
         now = datetime.now()
         pmsg.blue(str(now))
         errors = helper.run_a_command(stepname)
+        ran_step = True
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
             pmsg.fail("This last script had errors." + steps[idx+1])
@@ -245,7 +265,6 @@ for idx, step in enumerate(steps):
         else:
             add_environment_overrides()
         continue
-
 
     # Is it a terraform directory?
     try:
@@ -256,7 +275,8 @@ for idx, step in enumerate(steps):
                 step_type = "terraform"
                 now = datetime.now()
                 pmsg.blue(str(now))
-                errors = run_terraform(step)
+                errors = run_terraform(site_terraform(step, configs["vsphere_server"]))
+                ran_step = True
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):
                     pmsg.fail("This last terraform had errors. " + steps[idx+1])
@@ -266,6 +286,9 @@ for idx, step in enumerate(steps):
             continue
     except:
         pass
+
+    if not ran_step:
+        pmsg.warning("Line ignored in step file: " + step + " Check your step file.")
 
 ###################### Done ########################
 exit_with_messages(total_errors)

@@ -4,12 +4,13 @@ import helper
 import interpolate
 import pmsg
 import os
+import stat
 import time
 
+site_name = os.environ["site_name"]
 yaml_source = os.environ["config_file"]
 template_file = "templates/workload-cluster-template.yaml"
-output_file = "/tmp/tkc_result"
-interpolate.interpolate_from_yaml_to_template(yaml_source, template_file, output_file)
+output_file = "/tmp/" + site_name + "-tkc_result"
 workload_cluster = os.environ["workload_cluster"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 
@@ -35,6 +36,9 @@ if helper.run_a_command("kubectl get tkc " + workload_cluster + " -n " + vsphere
     exit(0)
 
 # Try to create the workload cluster. I'm going to try several times if the yaml is not accepted.
+interpolate.interpolate_from_yaml_to_template(yaml_source, template_file, output_file)
+os.chmod(output_file, stat.S_IRWXG | stat.S_IRWXU | stat.S_IRWXO)
+
 cmd = ['kubectl', 'apply', '-f', output_file]
 pmsg.normal("Creating workload cluster...")
 for i in range(1, 10):
