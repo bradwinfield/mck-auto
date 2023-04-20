@@ -244,6 +244,7 @@ for idx, step in enumerate(steps):
 
     # If step is an "exit", then exit.
     if re.match("exit", step, re.IGNORECASE):
+        pmsg.normal(step)
         pmsg.normal("Step processing stopping now due to 'exit' statement in step file.")
         exit_with_messages(total_errors)
 
