@@ -5,7 +5,7 @@
 import helper
 import os
 
-os.environ["login_user"] = os.environ["tkg_user"]
-os.environ["login_password"] = os.environ["tkg_user_password"]
+os.environ["login_user"] = os.environ["vsphere_username"]
+os.environ["login_password"] = os.environ["vsphere_password"]
 
 exit(helper.run_a_command("./scripts/k8s_login.py"))

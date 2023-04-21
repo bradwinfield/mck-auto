@@ -117,6 +117,9 @@ if response.status_code > 299:
 next_cookie = get_next_cookie(response, token)
 token = get_token(response)
 
+6. get default-values and parse out the backupconfiguration
+backup
+
 ###################################################
 # 8. do a PUT to change the default admin password...
 print("STEP 8 Change default admin password. ################################")
@@ -131,6 +134,29 @@ if response.status_code > 299:
     exit(1)
 next_cookie = get_next_cookie(response, token)
 token = get_token(response)
+###################################################
+# 9a. Get the system configuration:
+print("STEP 9a - Get the system configuration..."
+path = "/api/systemconfiguration/?include_name=true&join=admin_auth_configuration.remote_auth_configurations.auth_profile_ref"
+response = requests.get(api_endpoint + path, headers=headers, cookies=next_cookie, verify=False)
+if response.status_code > 299:
+    pmsg.fail("Can't get system config data from AVI. HTTP: " + str(response.status_code) + " " + response.text)
+    exit(1)
+next_cookie = get_next_cookie(response, token)
+token = get_token(response)
+system_configuration = json.loads(response.text)
+
+##################################################
+# 9b. Get the system configuration:
+print("STEP 9b - Get the system configuration..."
+path = "/api/backupconfiguration/backupconfiguration-4f48934d-1cc3-433e-91e4-4e241616d4b4?include_name=true"
+response = requests.get(api_endpoint + path, headers=headers, cookies=next_cookie, verify=False)
+if response.status_code > 299:
+    pmsg.fail("Can't get system config data from AVI. HTTP: " + str(response.status_code) + " " + response.text)
+    exit(1)
+next_cookie = get_next_cookie(response, token)
+token = get_token(response)
+system_configuration = json.loads(response.text)
 ###################################################
 # 9. Create/Enter a passphrase...
 print("STEP 9 Create a passphrase")

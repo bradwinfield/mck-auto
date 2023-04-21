@@ -13,18 +13,18 @@ terraform {
 }
 provider "namespace-management" {
   vsphere_hostname = var.vsphere_server
-  #vsphere_username = var.vsphere_username
-  #vsphere_password = var.vsphere_password
-  vsphere_username = var.tkg_user
-  vsphere_password = var.tkg_user_password
+  vsphere_username = var.vsphere_username
+  vsphere_password = var.vsphere_password
+  #vsphere_username = var.tkg_user
+  #vsphere_password = var.tkg_user_password
   vsphere_insecure = true
 }
 provider "vsphere" {
   vsphere_server = var.vsphere_server
-  #user           = var.vsphere_username
-  #password       = var.vsphere_password
-  user           = var.tkg_user
-  password       = var.tkg_user_password
+  user           = var.vsphere_username
+  password       = var.vsphere_password
+  #user           = var.tkg_user
+  #password       = var.tkg_user_password
   allow_unverified_ssl = true
 }
 
@@ -32,22 +32,22 @@ variable "vsphere_server" {
   type        = string
   description = "vsphere server IP or FQDN."
 }
-#variable "vsphere_username" {
-#  type        = string
-#  description = "Admin user in vCenter."
-#}
-#variable "vsphere_password" {
-#  type        = string
-#  description = "Admin password."
-#}
-variable "tkg_user" {
+variable "vsphere_username" {
   type        = string
   description = "Admin user in vCenter."
 }
-variable "tkg_user_password" {
+variable "vsphere_password" {
   type        = string
   description = "Admin password."
 }
+#variable "tkg_user" {
+#  type        = string
+#  description = "Admin user in vCenter."
+#}
+#variable "tkg_user_password" {
+#  type        = string
+#  description = "Admin password."
+#}
 variable "vsphere_datacenter" {
   type        = string
   description = "Datacenter name..."

@@ -2,6 +2,7 @@
 
 # This script will create a config file from the template "create-vsphere-namespace.yaml"
 #  and then it will call the wcpctl.py apply <interpolated config file>
+# Dependent upon env_for_library_id.py
 
 import interpolate
 import pmsg
@@ -18,8 +19,8 @@ vsphere_namespace = os.environ["vsphere_namespace"]
 
 # The TKG user should be the one that performs this action...
 #vsphere_username = os.environ["vsphere_username"]
-vsphere_username = os.environ["tkg_user"]
-vsphere_password = os.environ["tkg_user_password"]
+vsphere_username = os.environ["vsphere_username"]
+vsphere_password = os.environ["vsphere_password"]
 rc = 1
 
 def check_namespace_services_ready():
