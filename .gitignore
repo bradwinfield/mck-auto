@@ -129,5 +129,4 @@ dmypy.json
 .pyre/
 
 # Terraform stuff to ignore
-user_terraform/terraform.tfstate
-wm_terraform/terraform.tfstate
+site_terraform

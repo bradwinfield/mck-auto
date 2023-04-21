@@ -186,7 +186,11 @@ if not rc or configs is None:
     pmsg.fail("Can't read the config file: " + args.config_file)
     exit (1)
 
-# First thing to add to the environment is the name of the config file...
+# Just in case a prior environment override file exists... delete it.
+if os.path.isfile(helper.env_override_file):
+    os.remove(helper.env_override_file)
+
+# Add to the environment the name of the config file...
 if not add_to_environment({"config_file": args.config_file, "steps_file": args.steps_file}):
     pmsg.fail("Can't add the name of the config and steps files to the environment.")
 
