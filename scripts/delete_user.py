@@ -9,7 +9,7 @@
 import vcenter_api
 import pmsg
 import argparse
-
+import getpass
 
 ################################ Main #############################
 # setup args...
@@ -18,15 +18,17 @@ help_text = "Create/Check vCenter users for TKGs install."
 parser = argparse.ArgumentParser(description=help_text)
 parser.add_argument('-s', '--vsphere_server', required=True, help='vSphere admin user.')
 parser.add_argument('-u', '--vsphere_username', required=True, help='vSphere admin user.')
-parser.add_argument('-p', '--vsphere_password', required=True, help='vSphere admin password.')
+# parser.add_argument('-p', '--vsphere_password', required=True, help='vSphere admin password.')
 parser.add_argument('-d', '--delete_username', required=True, help='User to delete.')
 args = parser.parse_args()
 
 server = args.vsphere_server
 username = args.vsphere_username
-password = args.vsphere_password
+# password = args.vsphere_password
 delete_username = args.delete_username
-
+prompt_text = "Enter " + username + " password: "
+password = getpass.getpass(prompt=prompt_text, stream=None)
+    
 token = vcenter_api.vcenter_login(server, username, password)
 if len(token) < 1:
     pmsg.fail("No token obtained from login api call to vSphere. Check your user credentials in the config.yaml and try again. Exiting.")
