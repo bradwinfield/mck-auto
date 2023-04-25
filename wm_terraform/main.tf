@@ -239,6 +239,7 @@ resource "namespace-management_cluster" "supervisor" {
 # Only the newly enabled cluster (including the cluster ID)
 output "cluster" {
   value = namespace-management_cluster.supervisor
+  sensitive = true
 }
 
 output "content_library" {

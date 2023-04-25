@@ -24,17 +24,19 @@ Perform the following steps manually in AVI before completing the automation.
     f. Management Network: $avi_network_ip
     g. Defaut Gateway: $avi_default_gateway
     h. Create an IPAM profile: VIP
-       i. Add Network: $avi_network
+       i. Add by selecting the data/VIP Network.
     i. Click SAVE
 
 13. Configure the user workload network (Infrastructure -> Cloud Resources -> Networks)
     a. IP range for the user workload network.
 
-14. Configure the VRF state route (Infrastructure -> Cloud Resources -> VRF Context)
+14. Configure the VRF static route 0.0.0.0/0 $data_network_gateway_ip (Infrastructure -> Cloud Resources -> VRF Context)
 
 15. Change the license type to ESSENTIALS
 
-16. Put the certificate into $config_file
+16. Certificate:
+  a. Put the certificate into $config_file
+  b. Put the certificate (root+intermediate) and cert into AVI and make it the one for the console.
 
 17. Complete a steps2.conf to prepare for the remainder of automation.
 

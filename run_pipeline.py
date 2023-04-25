@@ -77,17 +77,18 @@ def read_yaml_config_file(filename):
     return True, configs
 
 
-def add_environment_overrides():
+def add_environment_overrides(file):
     return_code = False
-    if os.path.isfile(helper.env_override_file):
+    if os.path.isfile(file):
         # Add lines to the environment
-        rc, configs = read_yaml_config_file(helper.env_override_file)
+        rc, configs = read_yaml_config_file(file)
         if rc:
             if not add_to_environment(configs):
                 pmsg.fail("Can't add overrides to the environment.")
 
         # Delete the environment override file so I don't apply at a later time.
-        os.remove(helper.env_override_file)
+        if file == helper.env_override_file:
+            os.remove(file)
     return return_code
 
 
@@ -110,6 +111,10 @@ def site_terraform(tfolder, vsphere_server):
     site_name = re.split('\.', vsphere_server)[0]
     site_dir = "site_terraform/" + site_name
     terraform_dir = site_dir + "/" + tfolder
+    # if site_terraform does not exist, create it
+    if not os.path.isdir("site_terraform"):
+        os.mkdir("site_terraform")
+        os.chmod("site_terraform", stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
     # if the site_dir does not exist, create it
     if not os.path.isdir(site_dir):
         os.mkdir(site_dir)
@@ -164,6 +169,7 @@ help_text += "./run_pipeline.py --help\n"
 parser = argparse.ArgumentParser(description='Pipeline main script to deploy a TKGs workload cluster.')
 parser.add_argument('-c', '--config_file', required=True, help='Name of yaml file which contains config params')
 parser.add_argument('-s', '--steps_file', required=True, help='Name of steps file; what scripts will run this time.')
+parser.add_argument('-p', '--password_file', required=False, help='Name of additional configs file (secrets).')
 parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
 parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose output.')
 parser.add_argument('-n', '--pw_from_env', default=False, action='store_true', required=False, help='PWs from $password.')
@@ -172,6 +178,7 @@ args = parser.parse_args()
 verbose = args.verbose
 dry_run = args.dry_run
 password_noprompt = args.pw_from_env
+password_file = args.password_file
 
 dry_run_flag = ""
 if dry_run:
@@ -216,6 +223,8 @@ if not add_to_environment({"site_name": site_name}):
 if password_noprompt:
     pw = os.environ["password"]
     add_to_environment({"vsphere_password": pw, "tkg_user_password": pw, "avi_vsphere_password": pw, "avi_password": pw})
+elif password_file is not None:
+    add_environment_overrides(password_file)
 else:
     prompt_text = "vCenter Admin: " + os.environ["vsphere_username"] + " password: "
     pw1 = getpass.getpass(prompt=prompt_text, stream=None)
@@ -255,20 +264,24 @@ for idx, step in enumerate(steps):
     ran_step = False
     # What kind of step is this?
     # Is it a script?
-    stepname = "./scripts/" + step.strip()
+    step_parts = step.split()
+    stepname = "./scripts/" + step_parts[0]
     if os.path.exists(stepname):
         # Must be a script...
         step_type = "script"
         now = datetime.now()
         pmsg.blue(str(now))
-        errors = helper.run_a_command(stepname)
+        arguments = ""
+        if len(step_parts) > 1:
+            arguments = " ".join(step_parts[1:len(step_parts)])
+        errors = helper.run_a_command(stepname + " " + arguments)
         ran_step = True
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
             pmsg.fail("This last script had errors." + steps[idx+1])
             abort_exit = True
         else:
-            add_environment_overrides()
+            add_environment_overrides(helper.env_override_file)
         continue
 
     # Is it a terraform directory?

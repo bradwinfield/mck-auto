@@ -32,6 +32,7 @@ primary_workload_network_vsphere_portgroup_name: "user-workload"
 # Data network (VIP network)
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
+data_network_gateway_ip: 10.220.47.62
 
 dns_servers: "10.220.136.2"
 #dns_servers: "10.79.2.6"
@@ -39,7 +40,6 @@ dns_search_domain: "h2o-75-9210.h2o.vmware.com"
 ntp_servers: "10.188.26.119"
 
 avi_controller_ip: "avi.h2o-75-9210.h2o.vmware.com"
-#avi_network: "avi Internal"
 avi_network: "esxi-mgmt"
 avi_subnet_mask: "255.255.255.224"
 avi_network_ip: "10.220.30.128/27"
@@ -54,9 +54,9 @@ avi_vm_name3: "avi03"
 avi_vm_ip3: "10.220.30.133"
 avi_floating_ip: "10.220.30.134"
 # Leaving one IP open for the AVI Floating VIP
-avi_se_starting_ip: "10.220.30.135"
-avi_se_ending_ip: "10.220.30.136"
-avi_content_library: "avi"
+# The following are allocated from the pool in the management network
+# avi_se_starting_ip: "10.220.30.135"
+# avi_se_ending_ip: "10.220.30.136"
 
 # This cert is created when AVI is installed.
 # It is a system-standard-portal type in AVI and is used to access the AVI by terraform.

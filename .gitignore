@@ -130,3 +130,4 @@ dmypy.json
 
 # Terraform stuff to ignore
 site_terraform
+passwords

@@ -18,7 +18,6 @@ wcpctl_config = "/tmp/" + site_name + "-wcpctl_config.yaml"
 vsphere_namespace = os.environ["vsphere_namespace"]
 
 # The TKG user should be the one that performs this action...
-#vsphere_username = os.environ["vsphere_username"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
 rc = 1
