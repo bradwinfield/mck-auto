@@ -32,7 +32,7 @@ primary_workload_network_vsphere_portgroup_name: "user-workload"
 # Data network (VIP network)
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
-data_network_gateway_ip: 10.220.47.62
+data_network_gateway_ip: "10.220.47.62"
 
 dns_servers: "10.220.136.2"
 #dns_servers: "10.79.2.6"

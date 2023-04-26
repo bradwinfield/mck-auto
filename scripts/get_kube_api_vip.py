@@ -5,6 +5,7 @@ import os
 import urllib3
 import helper
 import time
+import pmsg
 
 urllib3.disable_warnings()
 
@@ -33,7 +34,7 @@ def get_kube_api_vip(api_endpoint, login):
 # If not, use the IP address...
 server = os.environ["avi_floating_ip"]
 api_endpoint = "https://" + server
-avi_user = os.environ["avi_username"]
+avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
 
 # Set up the HTTP headers and authentication token
@@ -43,7 +44,7 @@ headers = {
 #    "X-Avi-Version": "18.2.7",
 
 # Login and get session ID...
-login = requests.post(api_endpoint + "/login", verify=False, data={'username': 'admin', 'password': avi_password})
+login = requests.post(api_endpoint + "/login", verify=False, data={'username': avi_username, 'password': avi_password})
 
 # Try to retrieve the kube_api VIP. We may have to wait a while before it is allocated in AVI after
 #  terraform starts to create the supervisor cluster.

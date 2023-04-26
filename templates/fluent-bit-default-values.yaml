@@ -15,7 +15,7 @@ fluent_bit:
         Match             *
         Host              {{ splunk_url }}
         Port              {{ splunk_port }}
-        Token             {{ splunk_token }}
+        splunk_token      {{ splunk_token }}
     inputs: |
       [INPUT]
         Name              tail
