@@ -21,6 +21,7 @@ workload_cluster: "atl1-tkgs-workload"
 supervisor_network_starting_ip: "10.220.30.139"
 supervisor_network_subnet_mask: "255.255.255.224"
 supervisor_network_gateway_ip: "10.220.30.158"
+supervisor_network_static_ip_pool: "10.220.30.144-10.220.30.157"
 
 # Workload network
 primary_workload_network_static_gateway_ipv4: "10.220.47.62"

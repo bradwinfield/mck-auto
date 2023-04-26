@@ -111,8 +111,14 @@ def get_next_cookie_jar(response, last_cookie_jar, avi_vm_ip, token):
             cookie_jar.set_cookie(a_set_cookie)
     return cookie_jar
 
+def login(api_endpoint, verify, avi_username, avi_password):
+    path = "/login"
+    data={'username': avi_username, 'password': avi_password}
+    return requests.post(api_endpoint + path, verify=False, data=data)
+    
 def logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token):
     path = "/logout"
-    logout_response = requests.post(api_endpoint + path, verify=False, headers={'X-CSRFToken': token, 'Referer': api_endpoint}, cookies=login_response.cookies)
+    data={'username': avi_username, 'password': avi_password}
+    logout_response = requests.post(api_endpoint + path, verify=False, headers={'X-CSRFToken': token, 'Referer': api_endpoint}, data=data, cookies=login_response.cookies)
     if logout_response.status_code >= 300:
         pmsg.warning("Can't logout of AVI. " + str(logout_response.status_code) + logout_response.text)
