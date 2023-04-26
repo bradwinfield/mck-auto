@@ -13,6 +13,7 @@ urllib3.disable_warnings()
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
 avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
+avi_data_network_ref = os.environ["avi_data_network_ref"]
 vsphere_server = os.environ["vsphere_server"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
@@ -29,27 +30,22 @@ def get_avi_object(api_endpoint, path, login_response, avi_username, avi_passwor
     headers = helper_avi.make_header(api_endpoint, token, avi_username, avi_password)
     response = requests.get(api_endpoint + path, verify=False, headers=headers, cookies=dict(sessionid=login_response.cookies['sessionid']))
 
-    cloud_details = json.loads(response.text)
+    ipam_details = json.loads(response.text)
 
     if response.status_code == 200:
-        return response, cloud_details
+        return response, ipam_details
     else:
-        pmsg.fail("Error retrieving cloud config: " + str(response.status_code) + response.text)
+        pmsg.fail("Error retrieving IPAM configs: " + str(response.status_code) + response.text)
     return response, None
 
-def put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token):
-    # Update or construct AVI object json... ## SAMPLE ##
-    avi_object_details = obj_details["results"][0]
-    avi_object_details["vtype"] = "CLOUD_VCENTER"
-    uuid = obj_details["uuid"]
-
+def post_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token):
     # send it back
-    path = "/api/cloud/" + uuid
+    path = "/api/ipamdnsproviderprofile"
 
     # Must set the header and the cookie for a PUT call...
     headers = helper_avi.make_header(api_endpoint, token, avi_username, avi_password)
     cookies = helper_avi.get_next_cookie_jar(login_response, None, avi_vm_ip, token)
-    response = requests.put(api_endpoint + path, verify=False, json=obj_details, headers=headers, cookies=cookies)
+    response = requests.post(api_endpoint + path, verify=False, json=obj_details, headers=headers, cookies=cookies)
     if response.status_code < 300:
         pmsg.green("AVI object updated.")
         return True
@@ -71,23 +67,41 @@ token = helper_avi.get_token(login_response, "")
 
 # ##################### GET AVI Object #############################################
 # If modifying an AVI object, get the current configuration of whatever you are going to modify...
-path = "/api/cloud" # <- example
+path = "/api/ipamdnsproviderprofile"
 response, obj_details = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
 if obj_details is not None:
     token = helper_avi.get_token(response, token)
 
-    # Do what you need to do to check the object before returning...
-    # if object not what I was expecting...
-    #    pmsg.fail("AVI object X not ... whatever message.")
-
-    #else:
-    #    pmsg.green("AVI object data retrieved OK.")
+    #  Sample of what came back
+    # {"count": 0, "results": []}
+    if obj_details["count"] == 0:
+        # Here is what I need to send back (POST)
+        ipam_profile = {
+            # "_last_modified": "1682517665712989",
+            "allocate_ip_in_vrf": False,
+            "internal_profile": {
+                "ttl": 30,
+                "usable_networks": [
+                    {
+                        "nw_ref": avi_data_network_ref
+                    }
+                ]
+            },
+            "name": "vip-data-network",
+            "tenant_ref": "https://" + avi_vm_ip + "/api/tenant/admin",
+            "type": "IPAMDNS_TYPE_INTERNAL",
+            # "url": "https://10.220.30.131/api/ipamdnsproviderprofile/ipamdnsproviderprofile-f1dd823c-fdff-4510-88cb-88c11d44099a",
+            # "uuid": "ipamdnsproviderprofile-f1dd823c-fdff-4510-88cb-88c11d44099a"
+        }
 
 # ##################### PUT AVI Object #############################################
-        # Setup json object in preparation for PUTting to AVI...
-        obj_details = {}
-        if put_avi_object(api_endpoint, response, obj_details, avi_vm_ip, avi_username, avi_password, token):
+        if post_avi_object(api_endpoint, response, ipam_profile, avi_vm_ip, avi_username, avi_password, token):
+            pmsg.green("AVI IPAM profile for the data/vip network OK.")
             exit_code = 0
+        else:
+            pmsg.fail("Can't create IPAM profile for the data/vip network in AVI: " + str(response.status_code) + " " + response.text)
+    else:
+        pmsg.fail("Expected no IPAM profiles.")
 else:
     pmsg.fail("Can't retrieve AVI data from path: " + path + ".")
 
@@ -95,3 +109,4 @@ if logged_in:
     helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)
 
 exit(exit_code)
+
