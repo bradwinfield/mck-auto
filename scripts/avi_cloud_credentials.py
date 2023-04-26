@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Does initial setup of Default-Cloud with vCenter credentials.
+
 import requests
 import json
 import os
@@ -17,8 +19,9 @@ vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
 vsphere_datacenter = os.environ["vsphere_datacenter"]
 
-server = os.environ["avi_vm_ip"]
-api_endpoint = "https://" + server
+if "avi_vm_ip_override" in os.environ.keys():
+    avi_vm_ip = os.environ["avi_vm_ip_override"]
+api_endpoint = "https://" + avi_vm_ip
 
 def get_cloud_details(api_endpoint, login_response, avi_username, avi_password, token):
     # Send a GET request to the API endpoint to retrieve the Default-Cloud details...

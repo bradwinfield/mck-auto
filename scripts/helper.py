@@ -128,3 +128,9 @@ def check_for_result_for_a_time(command_and_args_list, expression, check_how_oft
         time.sleep(check_how_often)
 
     return found
+
+def get_address_with_offset(ip_address, count):
+    # Split this into 4 octets and add the count to the last octet and put it back together.
+    parts = re.split('\.', ip_address)
+    part4 = int(parts[3]) + count-1
+    return parts[0] + "." + parts[1] + "." + parts[2] + "." + str(part4)
