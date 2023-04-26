@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 
 # Hits the admin-user-setup page in an AVI vm to initialize the admin user.
-# This script is not able to change the 'admin' password. Must be done manually
-# at this time.
+# This script sets the admin password and is under test to
+# set the passphrase.
 import requests
 import urllib3
 import os
 import json
 import pmsg
-import http.cookiejar
-import http.cookies
-import re
 import helper_avi
-from datetime import datetime
+import pdb
 
 urllib3.disable_warnings()
 
 def do_exit(exit_code):
+    pdb.set_trace()
     if logged_in:
         helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)
     exit(exit_code)
@@ -48,7 +46,7 @@ if login_response.status_code > 299:
     do_exit(1)
 logged_in = True
 token = helper_avi.get_token(login_response, "")
-next_cookie_jar = helper_avi.get_next_cookie_jar(login_response, None, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(login_response, None, avi_vm_ip, token)
 ###################################################
 # pmsg.normal("STEP 2 GET initial-data?include_name&treat_expired_session_as_unauthenticated=true ###############")
 path = "/api/initial-data?include_name&treat_expired_session_as_unauthenticated=true"
@@ -57,7 +55,7 @@ if response.status_code > 299:
     pmsg.fail("Can't get config data from AVI api. HTTP: " + str(response.status_code) + response.text)
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 
 ###################################################
 # pmsg.normal("STEP 3 POST login with default pw. #############################")
@@ -71,15 +69,10 @@ if response.status_code > 299:
     pmsg.fail("Can't login to AVI. HTTP: " + str(response.status_code) + response.text)
     pmsg.fail("Recommend manual set of AVI password.")
     pmsg.underline(api_endpoint + "/")
+    logged_in = False
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
-
-# newcookies = re.sub(r"expires=(...),", "expires=\\1#", cookie)
-# cookies_list = newcookies.split(', ')
-# put the found cookies into a dictionary where the name is csrftoken, sessionid, avi-sessionid
-# and the value is the rest of the stuff. And replace the expires=...# back to a expires=...,
-# and use in next requests ( ... , cookies=cookie_dict)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 
 ###################################################
 # 4. do a GET to get inital data and invalidate the session...
@@ -92,7 +85,7 @@ if response.status_code > 299:
     pmsg.fail("Can't get config data from AVI. HTTP: " + str(response.status_code) + response.text)
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 cookie = response.headers.get('Set-Cookie')
 
 ###################################################
@@ -105,7 +98,7 @@ if response.status_code > 299:
     pmsg.fail("Can't get config data from AVI. HTTP: " + str(response.status_code) + response.text)
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 
 ###################################################
 # 6. get default-values and parse out the backupconfiguration
@@ -117,7 +110,7 @@ if response.status_code > 299:
     pmsg.fail("Can't get config data from AVI. HTTP: " + str(response.status_code) + response.text)
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 json_obj = json.loads(response.text)
 backupid = json_obj["default"]["backupconfiguration"][0]
 # pmsg.normal("Backup Configuration: " + backupid)
@@ -143,7 +136,7 @@ if response.status_code > 299:
     pmsg.fail("Can't change the default admin password in AVI. Recommend manual operation. HTTP: " + str(response.status_code) + response.text)
     do_exit(1)
 token = helper_avi.get_token(response, token)
-next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip)
+next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_vm_ip, token)
 
 ###################################################
 # 9a. Get the system configuration:
@@ -204,5 +197,4 @@ if response.status_code > 299:
     do_exit(1)
 pmsg.green("AVA admin password/passphrase OK.")
 
-do_exit(logged_in)
-
+do_exit(0)

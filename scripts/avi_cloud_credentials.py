@@ -53,7 +53,6 @@ def set_cloud_details(api_endpoint, login_response, cloud_details, avi_vm_ip, av
     path = "/api/cloud/" + uuid
     headers = helper_avi.make_header(api_endpoint, token, avi_username, avi_password)
     next_cookie_jar = helper_avi.get_next_cookie_jar(login_response, None, avi_vm_ip, token)
-    # response = requests.post(api_endpoint + path, verify=False, headers=headers, cookies=dict(sessionid=login_response.cookies['sessionid']))
     response = requests.put(api_endpoint + path, verify=False, json=default_cloud_details, headers=headers, cookies=next_cookie_jar)
     if response.status_code < 300:
         pmsg.green("Default-Cloud updated with vCenter credentials.")
@@ -65,27 +64,30 @@ def set_cloud_details(api_endpoint, login_response, cloud_details, avi_vm_ip, av
 
 # ##################################################################
 # Login and get session ID...
-path = "/login"
 logged_in = False
 exit_code = 1
-login_response = requests.post(api_endpoint + path, verify=False, data={'username': avi_username, 'password': avi_password})
+login_response = helper_avi.login(api_endpoint, False, avi_username, avi_password)
 if login_response.status_code >= 300:
     pmsg.fail("Can't login to AVI.")
     exit(exit_code)
 logged_in = True
 token = helper_avi.get_token(login_response, "")
 
-# Try to retrieve the kube_api VIP. We may have to wait a while before it is allocated in AVI after
-#  terraform starts to create the supervisor cluster.
+# Get the Cloud Configurations for all clouds. This will give us the uuid for Default-Cloud.
 response, cloud_details = get_cloud_details(api_endpoint, login_response, avi_username, avi_password, token)
 if response.status_code < 300:
     logged_in = True
 if cloud_details is not None:
-    token = helper_avi.get_token(response, token)
-    pmsg.green("Cloud data retrieved OK.")
-    pmsg.normal(cloud_details["results"][0]["uuid"])
-    if set_cloud_details(api_endpoint, response, cloud_details, avi_vm_ip, avi_username, avi_password, token):
-        exit_code = 0
+    if cloud_details["count"] != 1:
+        pmsg.warning("AVI seems to have already been configured with multiple 'Clouds'. There should only be 'Default-Cloud'. Proceeding anyway.")
+    if cloud_details["results"][0]["name"] != "Default-Cloud":
+        pmsg.fail("I am expecting Default-Cloud to be the first cloud defined but it isn't. Recommend deleting all Clouds except Default-Cloud.")
+    else:
+        token = helper_avi.get_token(response, token)
+        pmsg.green("Cloud data retrieved OK.")
+        pmsg.normal(cloud_details["results"][0]["uuid"])
+        if set_cloud_details(api_endpoint, response, cloud_details, avi_vm_ip, avi_username, avi_password, token):
+            exit_code = 0
 else:
     pmsg.fail("Can't retrieve Cloud data.")
 
