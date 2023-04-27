@@ -113,7 +113,7 @@ if found_network:
     configured_subnet = [{"prefix": prefix, "static_ip_ranges": [static_ip_range]}]
     update_network["configured_subnets"] = configured_subnet
 
-    response = put_avi_object(api_endpoint, response, update_network, avi_vm_ip, avi_username, avi_password, token)
+    response = put_avi_object(api_endpoint, login_response, update_network, avi_vm_ip, avi_username, avi_password, token)
     if response.status_code < 300:
         pmsg.green("AVI network updated OK.")
         exit_code = 0

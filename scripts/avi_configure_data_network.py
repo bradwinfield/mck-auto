@@ -9,7 +9,6 @@ import helper_avi
 import pmsg
 import re
 import time
-import pdb
 
 urllib3.disable_warnings()
 
@@ -62,7 +61,7 @@ def find_network(avi_network, api_endpoint, path, login_response, avi_username, 
                 update_network = network
                 pmsg.green("AVI network found OK.")
                 return True, response, update_network
-
+    return False, None, None
 
 # ################### LOGIN ###############################################
 # Login and get session ID...
@@ -79,7 +78,6 @@ token = helper_avi.get_token(login_response, "")
 path = "/api/network"
 found_network = False
 # Try for a while because the sync from vCenter to AVI may take a while...
-pdb.set_trace()
 for i in range(1, 20):
     found_network, response, update_network = find_network(data_network_vsphere_portgroup_name, api_endpoint, path, login_response, avi_username, avi_password, token)
     if found_network:

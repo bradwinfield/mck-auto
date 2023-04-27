@@ -15,8 +15,12 @@ avi_vm_ip = os.environ["avi_vm_ip1"]
 avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
 vsphere_server = os.environ["vsphere_server"]
-vsphere_username = os.environ["vsphere_username"]
-vsphere_password = os.environ["vsphere_password"]
+
+# vsphere_username = os.environ["vsphere_username"]
+# vsphere_password = os.environ["vsphere_password"]
+vsphere_username = os.environ["avi_vsphere_username"]
+vsphere_password = os.environ["avi_vsphere_password"]
+
 vsphere_datacenter = os.environ["vsphere_datacenter"]
 
 if "avi_vm_ip_override" in os.environ.keys():
@@ -88,7 +92,6 @@ if cloud_details is not None:
     else:
         token = helper_avi.get_token(response, token)
         pmsg.green("Cloud data retrieved OK.")
-        pmsg.normal(cloud_details["results"][0]["uuid"])
         if set_cloud_details(api_endpoint, response, cloud_details, avi_vm_ip, avi_username, avi_password, token):
             exit_code = 0
 else:

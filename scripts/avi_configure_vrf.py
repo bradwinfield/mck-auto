@@ -6,7 +6,6 @@ import os
 import urllib3
 import helper_avi
 import pmsg
-import pdb
 
 urllib3.disable_warnings()
 
@@ -81,7 +80,6 @@ if obj_details is not None:
             "route_id": "1"
         }
         vrf_object["static_routes"] = [static_route]
-        pdb.set_trace()
 
 # ##################### PUT AVI Object #############################################
         response = put_avi_object(api_endpoint, login_response, vrf_object, avi_vm_ip, avi_username, avi_password, token)
