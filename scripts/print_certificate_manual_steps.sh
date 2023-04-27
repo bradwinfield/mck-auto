@@ -9,7 +9,7 @@ Perform the following steps manually in AVI (https://$avi_vm_ip1) before complet
    a. Change the "SSL/TLS Certificate" by removing the two you see and selecting the new Controller Certificate that you put in.
 4. Logout and Login to AVI to make sure it works.
 
-ALTERNATIVELY, you can find the certificate in AVI and put that into the config file so that vCenter can talk to AVI.
+ALTERNATIVELY, you MUST create the certificate in AVI (SANS to include the FQDN and all IP Addresses) and put that into the config file so that vCenter can talk to AVI.
 See the cert in: Templates -> Security -> SSL/TLS Certificates "System-Default-Portal-Cert"
 
 EOF

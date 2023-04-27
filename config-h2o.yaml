@@ -61,32 +61,31 @@ avi_vm_ip3: "10.220.30.133"
 avi_floating_ip: "10.220.30.134"
 # Leaving one IP open for the AVI Floating VIP
 # The following are allocated from the pool in the management network
-# avi_se_starting_ip: "10.220.30.135"
-# avi_se_ending_ip: "10.220.30.136"
 
 # This cert is created when AVI is installed.
 # It is a system-standard-portal type in AVI and is used to access the AVI by terraform.
 # We will really want to supply a signed cert at some point.
 avi_certificate: |
   -----BEGIN CERTIFICATE-----
-  MIIDRTCCAi2gAwIBAgIUJczjQfu5zOX0EmJErxS15UNZjkkwDQYJKoZIhvcNAQEL
-  BQAwHjEcMBoGA1UEAwwTRGVmYXVsdCBQb3J0YWwgQ2VydDAeFw0yMzA0MjcxNzU2
-  MTlaFw0zMzA0MjQxNzU2MTlaMB4xHDAaBgNVBAMME0RlZmF1bHQgUG9ydGFsIENl
-  cnQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDNON2HoL+hlxp7wfLR
-  /n/oxUKaM/dKVg8c0TAFJa+bCOtu3mb9BcD3KdRDw3aeX/PlJ35m1qQpUEKbWO6E
-  ktMUTBNXT99174/eK8puCatqJdu2wh8aQyPFOsxJ3f+fyOT283jHbdz0gxzh/chD
-  76p9y1mu/HH19L7xGjQZUUoXnAzh2LOXEB3qJFNbc+cWXHqOwGBN53oIMysnTucM
-  PzzRP/BmnMOFHQmENKdRS9t2BX0aBQyHhHNSopIIb0kZxkVh1J9ll1cvvN/s7HlJ
-  TNRXhfXmpiHf44hBBWhCVh7+Eq5/2oDNg74UCrqwPiP6F1fnymncQEdGarlyARsU
-  xgWNAgMBAAGjezB5MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wg
-  R2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBS69NVVSg5nWMjyApilh9Mv
-  YIJb0DAfBgNVHSMEGDAWgBS69NVVSg5nWMjyApilh9MvYIJb0DANBgkqhkiG9w0B
-  AQsFAAOCAQEAMsSFl9qneal16qJzdJeMe4FmSE+W+1/mhX/CN+pekNKRmilfhTnX
-  FTBxFDwvYrtyHRkzHVbEHRjCmcezmYoVZ7WK4R1xmXzl4BHfy57rfAdHJMmE5T2X
-  9zjAc7qr1Fd/qp4rNH+D6paOA946LaHsad93i7ywl5KHBDioC4+tKuIq3lwNZq93
-  gm0VAzDvQVjTG82ozN0KA3mzzcbAvfyxAfaA0VKCwQPoUnCfK21UsFRqnnbUe9HV
-  T+Bncwjw3ArRiVqgzyf6VrhRg3Zh2UX67PQ6YAYwoeQUc+DGWJVtwdfQ/YvjNmp6
-  MCmVp/LY6eddyFvLigmxiTsIZLFtdKAy0Q==
+  MIIDbTCCAlWgAwIBAgIUUTYiHx0z1Cg16+kyxuOONAoaHNcwDQYJKoZIhvcNAQEL
+  BQAwTTEPMA0GA1UECgwGdm13YXJlMREwDwYDVQQLDAhwbGF0Zm9ybTEnMCUGA1UE
+  AwweYXZpLmgyby03NS05MjEwLmgyby52bXdhcmUuY29tMB4XDTIzMDQyNzE4NTEy
+  NVoXDTI0MDQyNjE4NTEyNVowTTEPMA0GA1UECgwGdm13YXJlMREwDwYDVQQLDAhw
+  bGF0Zm9ybTEnMCUGA1UEAwweYXZpLmgyby03NS05MjEwLmgyby52bXdhcmUuY29t
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAswDKBcGPT1TZOPHoueU8
+  I0hZ3Lw894b3FAfwCYWYNzx7KzkU6AL8f/VVPdMmXFDju5ofvastI/WBE5lRoezi
+  ez6YvmpBoGDa1E1rO9wzKQEshM4icqIYos3Yvamxbj/BLYJSBnX/4WypHnfnE5g3
+  jfjcaW1CVyAhk0QfQC4UTu3yu9dsxMkMkXVgqEvMq3+cM48Xt3bOZ+6rulL2qb6X
+  OfypvX32vCSg9lzxzdAcGHrKanTDP88IoEBy9AmrHeiqJlYUzAcVznmmBfrZnjD9
+  Yggl2KJ/GP3jzdtf+7SF458VhnKSRfOBIxf9WUVgHGgy78p1Bhn2+BvyeruvzAPx
+  MwIDAQABo0UwQzBBBgNVHREEOjA4gh5hdmkuaDJvLTc1LTkyMTAuaDJvLnZtd2Fy
+  ZS5jb22HBArcHoOHBArcHoSHBArcHoWHBArcHoYwDQYJKoZIhvcNAQELBQADggEB
+  ABgIa97Fa2hUlBHUqGqKU4zGO1hUH0gK/SdrVW6tMVUH4xImZDELfCNUGct2dnj0
+  WVRvJDGFXdY13MU6nh2hO/MGO6GMe0QPdBEcEyHb1fAtfk6xj+NkLT2j6u+AHs2B
+  OSPcgxDbn9qRb32l77UeKQ4/h8VKZWMnGXVY7G31plFRZNCRrZbFjEAAMscdl57C
+  RVLOOLDRyxdPUB2kHHTh3QARkH7ry+bItNVe6RFLZzCuJbh1sSNFZqmPvu/I+I0q
+  akt5fBtkYQmMoPBwDXo8WUJBHPhn8Z4ataaFgMdTopyGyjE5Yr64qMzHpA4YSOi0
+  VjgsTutqXqT5WxEp8WRhSTo=
   -----END CERTIFICATE-----
 
 splunk_url: "http-inputs-mck.splunkcloud.com"

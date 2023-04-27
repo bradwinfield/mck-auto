@@ -59,10 +59,7 @@ avi_vm_ip2: "10.220.30.132"
 avi_vm_name3: "avi03"
 avi_vm_ip3: "10.220.30.133"
 avi_floating_ip: "10.220.30.134"
-# Leaving one IP open for the AVI Floating VIP
-# The following are allocated from the pool in the management network
-# avi_se_starting_ip: "10.220.30.135"
-# avi_se_ending_ip: "10.220.30.136"
+# The AVI Service Engine IPs are allocated out of the IP Pool
 
 # This cert is created when AVI is installed.
 # It is a system-standard-portal type in AVI and is used to access the AVI by terraform.
