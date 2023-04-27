@@ -17,10 +17,10 @@ urllib3.disable_warnings()
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
 avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
-data_network_ip = os.environ["data_network_ip"]
-data_network_vsphere_portgroup_name = os.environ["data_network_vsphere_portgroup_name"]
-data_network_static_starting_address_ipv4 = os.environ["data_network_static_starting_address_ipv4"]
-data_network_static_address_count = os.environ["data_network_static_address_count"]
+primary_workload_network_ip = os.environ["primary_workload_network_ip"]
+primary_workload_network_vsphere_portgroup_name = os.environ["primary_workload_network_vsphere_portgroup_name"]
+primary_workload_network_static_starting_address_ipv4 = os.environ["primary_workload_network_static_starting_address_ipv4"]
+primary_workload_network_static_address_count = os.environ["primary_workload_network_static_address_count"]
 
 avi_vm_ip = avi_vm_ip1
 if "avi_vm_ip_override" in os.environ.keys():
@@ -81,7 +81,7 @@ found_network = False
 # Try for a while because the sync from vCenter to AVI may take a while...
 pdb.set_trace()
 for i in range(1, 20):
-    found_network, response, update_network = find_network(data_network_vsphere_portgroup_name, api_endpoint, path, login_response, avi_username, avi_password, token)
+    found_network, response, update_network = find_network(primary_workload_network_vsphere_portgroup_name, api_endpoint, path, login_response, avi_username, avi_password, token)
     if found_network:
         break
     else:
@@ -90,11 +90,11 @@ for i in range(1, 20):
 if found_network:
     token = helper_avi.get_token(response, token)
     # Now update the update_network and PUT it back
-    avi_network_ip_parts = re.split('/', data_network_ip)
+    avi_network_ip_parts = re.split('/', primary_workload_network_ip)
     network_number = avi_network_ip_parts[0]
     mask = int(avi_network_ip_parts[1])
     # calculate the ending IP
-    end_ip = helper.get_address_with_offset(data_network_static_starting_address_ipv4, int(data_network_static_address_count))
+    end_ip = helper.get_address_with_offset(primary_workload_network_static_starting_address_ipv4, int(primary_workload_network_static_address_count))
 
     prefix = {
         "ip_addr": {"addr": network_number, "type": "V4"}, "mask": mask
@@ -103,7 +103,7 @@ if found_network:
     static_ip_range = {
         "range": {
             "begin":
-                {"addr": data_network_static_starting_address_ipv4, "type": "V4"},
+                {"addr": primary_workload_network_static_starting_address_ipv4, "type": "V4"},
             "end":
                 {"addr": end_ip, "type": "V4"}
         },

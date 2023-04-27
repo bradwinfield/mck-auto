@@ -64,7 +64,7 @@ def find_network(avi_network, api_endpoint, path, login_response, avi_username, 
                 update_network = network
                 pmsg.green("AVI network found OK.")
                 return True, response, update_network
-
+    return False, None, None
 
 # ################### LOGIN ###############################################
 # Login and get session ID...

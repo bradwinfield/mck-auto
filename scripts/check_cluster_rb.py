@@ -7,18 +7,42 @@
 
 import helper
 import pmsg
+import re
 
-cluster_role_binding = "auth-users"
+cluster_role_binding_yaml_file = "templates/workload_cluster_rolebinding.txt"
+
+# What is the name of the clusterrolebinding in the template to look for?
+with open(cluster_role_binding_yaml_file) as file:
+    cb_yaml = [line.rstrip() for line in file]
+
+crb_name = None
+state = "look_for_metadata"
+for i in range(0, len(cb_yaml)):
+    line = cb_yaml[i]
+    pmsg.normal(line)
+    if state == "look_for_metadata":
+        if "metadata:" in line:
+            # The next line starting with "name:" contains the crb name
+            state = "look_for_name"
+    if state == "look_for_name":
+        if "name:" in line:
+            parts = re.split(':', line.replace(' ', ''))
+            crb_name = parts[1]
+            break
+
+if crb_name is None:
+    pmsg.fail("Can't determine the Cluster Role Binding name in template: " + crb_name)
+    exit(1)
 
 # Check/Create:
-# create clusterrolebinding cluster_role_binding --clusterrole=psp:vmware-system-privileged --group=system:authenticated
 
 # Is the clusterrolebinding there?
-if not helper.check_for_result(["kubectl", "get", "clusterrolebinding", cluster_role_binding], cluster_role_binding+".*ClusterRole"):
+if not helper.check_for_result(["kubectl", "get", "clusterrolebindings"], crb_name):
     # Create the cluster role binding...
-    if helper.run_a_command("kubectl create clusterrolebinding " + cluster_role_binding + " --clusterrole=psp:vmware-system-privileged --group=system:authenticated") == 0:
+    # No interpolation needed yet.
+    if helper.run_a_command("kubectl apply -f " + cluster_role_binding_yaml_file) == 0:
         # Check it
-        if helper.check_for_result(["kubectl", "get", "psp", cluster_role_binding], cluster_role_binding+".*ClusterRole"):
+        if helper.check_for_result(["kubectl", "get", "clusterrolebindings"], crb_name):
             pass
     else:
         pmsg.fail("Failed to create clusterrolebinding... Recommend running by hand.")
