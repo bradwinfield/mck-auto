@@ -219,6 +219,12 @@ site_name = re.split('\.', configs["vsphere_server"])[0]
 if not add_to_environment({"site_name": site_name}):
     pmsg.fail("Can't add the site name to the environment.")
 
+# Some automation steps can only use one NTP or DNS server, so create singleton variables...
+parts = re.split(' |,|;', configs["dns_servers"].replace(" ", ""))
+add_to_environment({"dns_server": parts[0]})
+parts = re.split(' |,|;', configs["ntp_servers"].replace(" ", ""))
+add_to_environment({"ntp_server": parts[0]})
+
 # Prompt for password...
 if password_noprompt:
     pw = os.environ["password"]

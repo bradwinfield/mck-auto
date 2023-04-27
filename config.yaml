@@ -34,15 +34,15 @@ primary_workload_network_static_subnet_mask: "255.255.255.192"
 primary_workload_network_vsphere_portgroup_name: "user-workload"
 
 # Data network (VIP network)
+data_network_ip: "10.220.47.0/26"
 data_network_static_starting_address_ipv4: "10.220.47.1"
 data_network_static_address_count: "11"
 data_network_gateway_ip: "10.220.47.62"
 data_network_vsphere_portgroup_name: "user-workload"
 
-dns_servers: "10.220.136.2"
-#dns_servers: "10.79.2.6"
+dns_servers: "10.220.136.2,10.220.136.3"
 dns_search_domain: "h2o-75-9210.h2o.vmware.com"
-ntp_servers: "10.188.26.119"
+ntp_servers: "time1.oc.vmware.com,time2.oc.vmware.com,time3.oc.vmware.com,time4.oc.vmware.com"
 
 avi_controller_ip: "avi.h2o-75-9210.h2o.vmware.com"
 avi_network: "esxi-mgmt"
@@ -104,6 +104,7 @@ tkg_role: tkg
 avi_vsphere_username: "avi-admin"
 avi_vsphere_password: "prompt"
 avi_role: "avi"
+avi_ipam_provider_name: "vip-data-network"
 # UNUSED: avi_vsphere_resource_pool: "avi"
 
 # Admin username inside the AVI system; Use this to get access in the AVI UI.

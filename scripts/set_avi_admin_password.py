@@ -9,12 +9,11 @@ import os
 import json
 import pmsg
 import helper_avi
-import pdb
+import re
 
 urllib3.disable_warnings()
 
 def do_exit(exit_code):
-    pdb.set_trace()
     if logged_in:
         helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)
     exit(exit_code)
@@ -28,6 +27,7 @@ avi_vm_ip3 = os.environ["avi_vm_ip3"]
 avi_floating_ip = os.environ["avi_floating_ip"]
 dns_servers = os.environ["dns_servers"]
 dns_search_domain = os.environ["dns_search_domain"]
+ntp_servers = os.environ["ntp_servers"]
 
 avi_vm_ip = avi_vm_ip1
 if "avi_vm_ip_override" in os.environ.keys():
@@ -60,10 +60,7 @@ next_cookie_jar = helper_avi.get_next_cookie_jar(response, next_cookie_jar, avi_
 ###################################################
 # pmsg.normal("STEP 3 POST login with default pw. #############################")
 path = "/login?include_name=true"
-# header = helper_avi.make_header(api_endpoint, token, "admin", default_avi_password)
-
 data = {"username": avi_username, "password": default_avi_password}
-
 response = requests.post(api_endpoint + path, json=data, cookies=next_cookie_jar, verify=False)
 if response.status_code > 299:
     pmsg.fail("Can't login to AVI. HTTP: " + str(response.status_code) + response.text)
@@ -148,9 +145,18 @@ if response.status_code > 299:
     pmsg.fail("Can't get system config data from AVI. HTTP: " + str(response.status_code) + " " + response.text)
     do_exit(1)
 system_config_payload = json.loads(response.text)
-system_config_payload["dns_configuration"] = {"server_list": [{"addr": dns_servers, "type": "V4"}], "search_domain": dns_search_domain}
+array_of_dns_servers = []
+for server in re.split(' |,|;', dns_servers.replace(" ", "")):
+    one_dns_server = {"addr": server, "type": "DNS"}
+    array_of_dns_servers.append(one_dns_server)
+system_config_payload["dns_configuration"] = {"server_list": array_of_dns_servers, "search_domain": dns_search_domain}
 system_config_payload["email_configuration"] = {"smtp_type": "SMTP_NONE"}
 system_config_payload["ntp_configuration"]["ntp_server_list"] = []
+array_of_ntp_servers = []
+for server in re.split(' |,|;', ntp_servers.replace(" ", "")):
+    one_ntp_server = {"server": {"addr": server, "type": "DNS"}}
+    array_of_ntp_servers.append(one_ntp_server)
+system_config_payload["ntp_configuration"]["ntp_servers"] = array_of_ntp_servers
 system_config_payload["ntp_configuration"]["ntp_authentication_keys"] = []
 system_config_payload["mgmt_ip_access_control"] = {}
 system_config_payload["linux_configuration"] = {}

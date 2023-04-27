@@ -88,7 +88,7 @@ variable "supervisor_network_gateway_ip" {
   type = string
   description = "Supervisor network gateway IP address."
 }
-variable "dns_servers" {
+variable "dns_server" {
   type = string
   description = "DNS server IPs or FQDNs comma separated."
 }
@@ -96,7 +96,7 @@ variable "dns_search_domain" {
   type = string
   description = "DNS search domain."
 }
-variable "ntp_servers" {
+variable "ntp_server" {
   type = string
   description = "NTP Server IPs or FQDNs comma separated."
 }
@@ -214,12 +214,12 @@ resource "namespace-management_cluster" "supervisor" {
   master_network_static_address_count = var.supervisor_network_static_address_count
   master_network_static_subnet_mask = var.supervisor_network_subnet_mask
   master_network_static_gateway_ipv4 = var.supervisor_network_gateway_ip
-  master_dns_servers = var.dns_servers
-  worker_dns_servers = var.dns_servers
+  master_dns_servers = var.dns_server
+  worker_dns_servers = var.dns_server
   master_dns_search_domain = var.dns_search_domain
   master_dns_names = var.dns_search_domain
-  master_ntp_servers = var.ntp_servers
-  workload_ntp_servers = var.ntp_servers
+  master_ntp_servers = var.ntp_server
+  workload_ntp_servers = var.ntp_server
 
   data_network_static_starting_address_ipv4 = var.data_network_static_starting_address_ipv4
   data_network_static_address_count = var.data_network_static_address_count

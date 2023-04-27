@@ -6,6 +6,7 @@ import os
 import urllib3
 import helper_avi
 import pmsg
+import re
 
 urllib3.disable_warnings()
 
@@ -17,6 +18,10 @@ vsphere_server = os.environ["vsphere_server"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
 vsphere_datacenter = os.environ["vsphere_datacenter"]
+avi_network = os.environ["avi_network"]
+avi_network_ip = os.environ["avi_network_ip"]
+
+avi_ipam_provider_name = os.environ["avi_ipam_provider_name"]
 
 avi_vm_ip = avi_vm_ip1
 if "avi_vm_ip_override" in os.environ.keys():
@@ -37,25 +42,14 @@ def get_avi_object(api_endpoint, path, login_response, avi_username, avi_passwor
         pmsg.fail("Error retrieving cloud config: " + str(response.status_code) + response.text)
     return response, None
 
-def put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token):
-    # Update or construct AVI object json... ## SAMPLE ##
-    avi_object_details = obj_details["results"][0]
-    avi_object_details["vtype"] = "CLOUD_VCENTER"
-    uuid = obj_details["uuid"]
-
+def put_avi_object(api_endpoint, path, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token):
     # send it back
-    path = "/api/cloud/" + uuid
 
     # Must set the header and the cookie for a PUT call...
     headers = helper_avi.make_header(api_endpoint, token, avi_username, avi_password)
     cookies = helper_avi.get_next_cookie_jar(login_response, None, avi_vm_ip, token)
     response = requests.put(api_endpoint + path, verify=False, json=obj_details, headers=headers, cookies=cookies)
-    if response.status_code < 300:
-        pmsg.green("AVI object updated.")
-        return True
-    else:
-        pmsg.fail("Can't update AVI object: " + str(response.status_code) + ": " + response.text)
-    return False
+    return response
 
 
 # ################### LOGIN ###############################################
@@ -69,25 +63,74 @@ if login_response.status_code >= 300:
 logged_in = True
 token = helper_avi.get_token(login_response, "")
 
-# ##################### GET AVI Object #############################################
-# If modifying an AVI object, get the current configuration of whatever you are going to modify...
-path = "/api/cloud" # <- example
+# ##################### GET IPAM Provider Ref #######################
+path = "/api/ipamdnsproviderprofile"
+avi_ipam_provider_ref = None
 response, obj_details = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
 if obj_details is not None:
     token = helper_avi.get_token(response, token)
+    if obj_details["count"] > 0:
+        for ipam in obj_details["results"]:
+            if ipam["name"] == avi_ipam_provider_name:
+                avi_ipam_provider_ref = ipam["url"]
+                break
 
-    # Do what you need to do to check the object before returning...
-    # if object not what I was expecting...
-    #    pmsg.fail("AVI object X not ... whatever message.")
+if avi_ipam_provider_ref is None:
+    pmsg.fail("Can't find the IPAM profile reference that was created for Default-Cloud.")
+    exit(1)
 
-    #else:
-    #    pmsg.green("AVI object data retrieved OK.")
+# ##################### GET the AVI management network ref ########################
+path = "/api/vimgrnwruntime"    
+avi_management_network_ref = None
+response, vim_objects = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
+if vim_objects is not None:
+    token = helper_avi.get_token(response, token)
+    if vim_objects["count"] != 1:
+        for obj in vim_objects["results"]:
+            if obj["name"] == avi_network:
+                avi_management_network_ref = obj["url"]
+                break
 
-# ##################### PUT AVI Object #############################################
+if avi_management_network_ref is None:
+    pmsg.fail("Can't find the management network reference.")
+    exit(1)
+
+# ##################### GET AVI Object #############################################
+# If modifying an AVI object, get the current configuration of whatever you are going to modify...
+path = "/api/cloud"
+response, cloud_details = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
+if cloud_details is not None:
+    token = helper_avi.get_token(response, token)
+    if cloud_details["count"] != 1:
+        pmsg.warning("AVI seems to have already been configured with multiple 'Clouds'. There should only be 'Default-Cloud'. Proceeding anyway.")
+
+    if cloud_details["results"][0]["name"] == "Default-Cloud":
+        pmsg.green("Cloud data retrieved OK.")
+        token = helper_avi.get_token(response, token)
+        default_cloud_details = cloud_details["results"][0]
+        default_cloud_details["ipam_provider_ref"] = avi_ipam_provider_ref
+        default_cloud_details["vcenter_configuration"]["management_network"] = avi_management_network_ref
+        netparts = re.split('\/', avi_network_ip)
+        msubnet = {
+            "ip_addr": {
+                "addr": netparts[0],
+                "type": "V4"
+            },
+            "mask": int(netparts[1])
+        }
+        default_cloud_details["vcenter_configuration"]["management_ip_subnet"] = msubnet
+
         # Setup json object in preparation for PUTting to AVI...
-        obj_details = {}
-        if put_avi_object(api_endpoint, response, obj_details, avi_vm_ip, avi_username, avi_password, token):
+        uuid = default_cloud_details["uuid"]
+        path = "/api/cloud/" + uuid
+        response = put_avi_object(api_endpoint, path, login_response, default_cloud_details, avi_vm_ip, avi_username, avi_password, token)
+        if response.status_code < 300:
+            pmsg.green("AVI Default-Cloud finished OK.")
             exit_code = 0
+        else:
+            pmsg.fail("Can't update Defaut-Cloud. " + str(response.status_code) + " " + response.text)
+    else:
+        pmsg.fail("I am expecting Default-Cloud to be the first cloud defined but it isn't. Recommend deleting all Clouds except Default-Cloud.")
 else:
     pmsg.fail("Can't retrieve AVI data from path: " + path + ".")
 

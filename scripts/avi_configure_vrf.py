@@ -14,10 +14,7 @@ urllib3.disable_warnings()
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
 avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
-vsphere_server = os.environ["vsphere_server"]
-vsphere_username = os.environ["vsphere_username"]
-vsphere_password = os.environ["vsphere_password"]
-vsphere_datacenter = os.environ["vsphere_datacenter"]
+data_network_gateway_ip = os.environ["data_network_gateway_ip"]
 
 avi_vm_ip = avi_vm_ip1
 if "avi_vm_ip_override" in os.environ.keys():
@@ -40,12 +37,10 @@ def get_avi_object(api_endpoint, path, login_response, avi_username, avi_passwor
 
 def put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token):
     # Update or construct AVI object json... ## SAMPLE ##
-    avi_object_details = obj_details["results"][0]
-    avi_object_details["vtype"] = "CLOUD_VCENTER"
     uuid = obj_details["uuid"]
 
     # send it back
-    path = "/api/cloud/" + uuid
+    path = "/api/vrfcontext/" + uuid
 
     # Must set the header and the cookie for a PUT call...
     headers = helper_avi.make_header(api_endpoint, token, avi_username, avi_password)
@@ -67,29 +62,38 @@ token = helper_avi.get_token(login_response, "")
 
 # ##################### GET AVI Object #############################################
 # If modifying an AVI object, get the current configuration of whatever you are going to modify...
-path = "/api/cloud" # <- example
+vrf_object = None
+path = "/api/vrfcontext"
 response, obj_details = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
 if obj_details is not None:
     token = helper_avi.get_token(response, token)
 
-    # At this point, assuming you got here, you can examine the 'obj_details' and
-    # add/change/delete before PUT or POST back. PUT modifies existing objects.
-    # POST creates new objects.
-    pdb.set_trace()
+    # Find the global one...
+    for vrf in obj_details["results"]:
+        if vrf["name"] == "global":
+            vrf_object = vrf
+            break
 
-    # Do what you need to do to check the object before returning...
-    # if object not what I was expecting...
-    #    pmsg.fail("AVI object X not ... whatever message.")
+    if vrf_object is not None:
+        static_route = {
+            "prefix": {"ip_addr": {"addr": "0.0.0.0", "type": "V4" }, "mask": 0},
+            "next_hop": {"addr": data_network_gateway_ip, "type": "V4"},
+            "route_id": "1"
+        }
+        vrf_object["static_routes"] = [static_route]
+        pdb.set_trace()
 
 # ##################### PUT AVI Object #############################################
-    response = put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token)
-    if response.status_code < 300:
-        pmsg.green("Response is what I expected.")
-        exit_code = 0
+        response = put_avi_object(api_endpoint, login_response, vrf_object, avi_vm_ip, avi_username, avi_password, token)
+        if response.status_code < 300:
+            pmsg.green("AVI VRF Static Route OK.")
+            exit_code = 0
+        else:
+            pmsg.fail("Can't set the AVI VRF Statid Route. " + str(response.status_code) + " " + response.text)
     else:
-        pmsg.fail("Can't send object back..." + str(response.status_code) + " " + response.text)
+        pmsg.fail("Can't find the AVI global VRF context at: " + path + ".")
 else:
-    pmsg.fail("Can't retrieve AVI data from path: " + path + ".")
+    pmsg.fail("Can't retrieve AVI VRF Contexts from path: " + path + ".")
 
 if logged_in:
     helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)

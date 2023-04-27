@@ -29,6 +29,7 @@ def make_header(api_endpoint, token, username, pw):
         "accept": "application/json,text/plain,*/*",
         "x-csrftoken": token,
         "x-avi-version": "22.1.3",
+        "x-avi-useragent": "UI",
         "Referer": api_endpoint + "/",
         "Authorization": "Basic " + base64_creds.decode('ascii')
     }
@@ -74,7 +75,7 @@ def get_next_cookie_jar(response, last_cookie_jar, avi_vm_ip, token):
 
     # And update the cookie jar with any 'Set-Cookie' values
     sch = response.headers.get('Set-Cookie')
-    if len(sch) > 20:
+    if sch is not None and len(sch) > 20:
 
         # First, substitute the commas with '#' that follow the day-of-week name (Sun, -> Sun#). Then, split on comma.
         set_cookie_header = re.sub('expires=(\w{3}),', 'expires=\\1#', sch)
@@ -115,10 +116,10 @@ def login(api_endpoint, verify, avi_username, avi_password):
     path = "/login"
     data={'username': avi_username, 'password': avi_password}
     return requests.post(api_endpoint + path, verify=False, data=data)
-    
+
 def logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token):
     path = "/logout"
     data={'username': avi_username, 'password': avi_password}
     logout_response = requests.post(api_endpoint + path, verify=False, headers={'X-CSRFToken': token, 'Referer': api_endpoint}, data=data, cookies=login_response.cookies)
-    if logout_response.status_code >= 300:
-        pmsg.warning("Can't logout of AVI. " + str(logout_response.status_code) + logout_response.text)
+#    if logout_response.status_code >= 300:
+#        pmsg.warning("Can't logout of AVI. " + str(logout_response.status_code) + logout_response.text)
