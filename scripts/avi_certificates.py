@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# This script will create/check 2 certs in AVI
+# 1. root/intermediate certificate from "avi_root_certificate"
+# 2. controller certificate from "avi_certificate"
+# and then the system->ssl for the ui/api is changed to use this controller cert.
+
 import requests
 import json
 import os
@@ -14,15 +19,24 @@ urllib3.disable_warnings()
 avi_vm_ip1 = os.environ["avi_vm_ip1"]
 avi_username = os.environ["avi_username"]
 avi_password = os.environ["avi_password"]
+avi_certificate = os.environ["avi_certificate"]
+avi_root_certificate = os.environ["avi_root_certificate"]
 vsphere_server = os.environ["vsphere_server"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
 vsphere_datacenter = os.environ["vsphere_datacenter"]
 
+cert_name = "mck-avi"
+root_cert_name = "mck-avi-root"
+
 avi_vm_ip = avi_vm_ip1
 if "avi_vm_ip_override" in os.environ.keys():
     avi_vm_ip = os.environ["avi_vm_ip_override"]
 api_endpoint = "https://" + avi_vm_ip
+
+def get_cert_json():
+    cert_json =  {}
+    return cert_json
 
 def get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token):
     # Send a GET request to the API endpoint to retrieve the Default-Cloud details...
@@ -67,22 +81,36 @@ token = helper_avi.get_token(login_response, "")
 
 # ##################### GET AVI Object #############################################
 # If modifying an AVI object, get the current configuration of whatever you are going to modify...
+cert_name_found = False
+root_cert_name_found = False
 path = "/api/sslkeyandcertificate"
 response, obj_details = get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token)
 if obj_details is not None:
     token = helper_avi.get_token(response, token)
 
-    # At this point, assuming you got here, you can examine the 'obj_details' and
-    # add/change/delete before PUT or POST back. PUT modifies existing objects.
-    # POST creates new objects.
     pdb.set_trace()
+    for result in obj_details["results"]:
+        if result["name"] == cert_name:
+            cert_name_found = True
+        if result["name"] == root_cert_name:
+            root_cert_name_found = True
 
-    # Do what you need to do to check the object before returning...
-    # if object not what I was expecting...
-    #    pmsg.fail("AVI object X not ... whatever message.")
-    exit(0)
+    if not root_cert_name_found:
+        # create a json for the root cert
+        cert_json = get_cert_json()
+        cert_json["name"] = root_cert_name
+        # finish it and POST it to AVI
+
+    if not cert_name_found:
+        # create a json for the controller certificate
+        cert_json = get_cert_json()
+        cert_json["name"] = cert_name
+        # finish it and POST it to AVI
+pmsg.warning("Not working yet.")
+exit(1)
 
 # ##################### PUT AVI Object #############################################
+if not cert_name_found:
     response = put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token)
     if response.status_code < 300:
         pmsg.green("Response is what I expected.")

@@ -9,6 +9,9 @@ import helper
 import pmsg
 import re
 
+# First, make sure that the 'auth-users' with restricted PSP is in place...
+helper.run_a_command("kubectl create clusterrolebinding cluster_role_binding --clusterrole=psp:vmware-system-restricted --group=system:authenticated")
+
 cluster_role_binding_yaml_file = "templates/workload_cluster_rolebinding.yaml"
 
 # What is the name of the clusterrolebinding in the template to look for?
@@ -47,6 +50,5 @@ if not helper.check_for_result(["kubectl", "get", "clusterrolebindings"], crb_na
     else:
         pmsg.fail("Failed to create clusterrolebinding... Recommend running by hand.")
         exit(1)
-
 pmsg.green("Cluster Role Binding OK.")
 exit(0)

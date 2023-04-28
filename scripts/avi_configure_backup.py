@@ -6,7 +6,6 @@ import os
 import urllib3
 import helper_avi
 import pmsg
-import pdb
 
 urllib3.disable_warnings()
 
@@ -66,7 +65,6 @@ response, obj_details = get_avi_object(api_endpoint, path, login_response, avi_u
 if obj_details is not None:
     token = helper_avi.get_token(response, token)
 
-    pdb.set_trace()
     backup_config = obj_details["results"][0]
     backup_config["backup_passphrase"] = avi_password
 
