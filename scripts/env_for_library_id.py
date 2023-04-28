@@ -27,24 +27,25 @@ if len(token) < 1:
     exit(1)
 
 # Get content library id
-# curl -k -X POST 'https://vc01.h2o-75-9210.h2o.vmware.com/api/content/library?action=find' -H 'vmware-api-session-id: 03eae18b8fb3adf5133c602d3eca0e10' -H "Content-Type: application/json" --data '{"name": "vc01cl01-wcp"}'
-apipath = "/api/content/library?action=find"
-data = {"name": content_library}
-bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
-if bstring is not None:
-    content_library_id = bstring.decode('utf-8').strip('[]"')
-    helper.add_env_override(True, "content_library_id", content_library_id)
-else:
-    pmsg.fail("Can't find the content library.")
-    exit(1)
+if "content_library_id" not in os.environ.keys():
+    apipath = "/api/content/library?action=find"
+    data = {"name": content_library}
+    bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
+    if bstring is not None:
+        content_library_id = bstring.decode('utf-8').strip('[]"')
+        helper.add_env_override(True, "content_library_id", content_library_id)
+    else:
+        pmsg.fail("Can't find the content library.")
+        exit(1)
 
-data = {"name": avi_content_library}
-bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
-if bstring is not None:
-    avi_content_library_id = bstring.decode('utf-8').strip('[]"')
-    helper.add_env_override(False, "avi_content_library_id", avi_content_library_id)
-else:
-    pmsg.fail("Can't find the AVI content library.")
-    exit(1)
+if "avi_content_library_id" not in os.environ.keys():
+    data = {"name": avi_content_library}
+    bstring = vcenter_api.api_post_returns_content(vsphere_server, apipath, token, data, 200)
+    if bstring is not None:
+        avi_content_library_id = bstring.decode('utf-8').strip('[]"')
+        helper.add_env_override(False, "avi_content_library_id", avi_content_library_id)
+    else:
+        pmsg.fail("Can't find the AVI content library.")
+        exit(1)
 
 exit(0)

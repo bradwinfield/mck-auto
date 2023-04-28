@@ -13,6 +13,10 @@ import helper
 import vsphere_mob
 from pyVmomi import vim
 
+# Already in the environment?
+if os.environ.keys() >= {"vsphere_cluster_id", "parent_resource_pool_id", "avi_resource_pool_id"}:
+    exit(0)
+
 # Get server and credentials from the environment...
 vsphere_server = os.environ["vsphere_server"]
 vsphere_username = os.environ["vsphere_username"]

@@ -9,7 +9,7 @@ import helper
 import pmsg
 import re
 
-cluster_role_binding_yaml_file = "templates/workload_cluster_rolebinding.txt"
+cluster_role_binding_yaml_file = "templates/workload_cluster_rolebinding.yaml"
 
 # What is the name of the clusterrolebinding in the template to look for?
 with open(cluster_role_binding_yaml_file) as file:

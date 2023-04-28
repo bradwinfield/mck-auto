@@ -29,7 +29,7 @@ vsphere_namespace = os.environ["vsphere_namespace"]
 def try_to_login(command):
     if helper.run_a_command(command) == 0:
         # Connect to the context
-        command = "kubectl config use-context " + supervisor_cluster_vip 
+        command = "kubectl config use-context " + supervisor_cluster_vip
 
         if helper.run_a_command(command) == 0:
             # Verify that I'm logged in...
@@ -42,39 +42,20 @@ def try_to_login(command):
                     return True
     return False
 
-def control_plane_ready():
-    ready = True
-
-    lines = helper.run_a_command_get_stdout(["kubectl", "get", "nodes"])
-    for line in lines:
-        if re.match('.*control-plane', line):
-            parts = line.split()
-            if parts[1] != "Ready":
-                ready = False
-    return ready
-
 
 # ##################################### Main ###############################
 login_command = "kubectl vsphere login --server " + supervisor_cluster_vip + " --vsphere-username " + vsphere_username + " --insecure-skip-tls-verify"
 
 logged_in = False
+exit_code = 1
 for i in range(1, 30):
     # Try to login until either I'm successful or I try too many times.
     logged_in = try_to_login(login_command)
     if logged_in:
-        ready = True
+        exit_code = 0
+        pmsg.green("Log in OK.")
         break
+    pmsg.notice("Will try again in a minute...")
     time.sleep(50)
 
-#ready = False
-#if logged_in:
-#    for i in range(1, 10):
-#        ready = control_plane_ready()
-#        if ready:
-#            break
-#        time.sleep(30)
-
-if ready:
-    exit(0)
-else:
-    exit(1)
+exit(exit_code)

@@ -27,10 +27,14 @@ def get_kube_api_vip(api_endpoint, login):
         print("Error retrieving virtual services: ", response.text)
     return False
 
+
 # ################################## Main ################################
+if "supervisor_cluster_vip" in os.environ.keys():
+    exit(0)
+
 # Set up the API endpoint and authentication details
 # If we have a DNS entry pre-created for AVI at this DC, then use this...
-#server = os.environ["avi_controller_ip"]
+# server = os.environ["avi_controller_ip"]
 # If not, use the IP address...
 server = os.environ["avi_floating_ip"]
 api_endpoint = "https://" + server
@@ -52,7 +56,7 @@ for i in range(1, 30):
     if get_kube_api_vip(api_endpoint, login):
         pmsg.green("Kube API VIP OK.")
         exit(0)
-    time.sleep(60)    
+    time.sleep(60)
 
 pmsg.fail("Can't find the kube API VIP from AVI.")
 exit(1)

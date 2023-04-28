@@ -12,6 +12,10 @@ import pdb
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+# Already in the environment?
+if os.environ.keys() >= {"tkg_role_id", "avi_role_id"}:
+    exit(0)
+
 vsphere_server = os.environ["vsphere_server"]
 username = os.environ["vsphere_username"]
 password = os.environ["vsphere_password"]
