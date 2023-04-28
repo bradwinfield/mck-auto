@@ -10,7 +10,7 @@ import pmsg
 import re
 
 # First, make sure that the 'auth-users' with restricted PSP is in place...
-helper.run_a_command("kubectl create clusterrolebinding cluster_role_binding --clusterrole=psp:vmware-system-restricted --group=system:authenticated")
+helper.run_a_command("kubectl create clusterrolebinding auth-users --clusterrole=psp:vmware-system-restricted --group=system:authenticated")
 
 cluster_role_binding_yaml_file = "templates/workload_cluster_rolebinding.yaml"
 

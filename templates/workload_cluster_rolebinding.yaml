@@ -1,15 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-	name: improving-rb
+  name: improving-rb
 roleRef:
-	apiGroup: rbac.authorization.k8s.io
-	kind: ClusterRole
-	name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
-  name: sso:ATTP_DSR_Admins@na.corp.mckesson.com
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: sso:psas-dsr-k8sclu-admin@na.corp.mckesson.com
+  name: sso:psas-dsr-k8clu-admin@na.corp.mckesson.com
