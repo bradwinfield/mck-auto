@@ -34,8 +34,26 @@ if "avi_vm_ip_override" in os.environ.keys():
     avi_vm_ip = os.environ["avi_vm_ip_override"]
 api_endpoint = "https://" + avi_vm_ip
 
-def get_cert_json():
-    cert_json =  {}
+def get_root_cert_json(certificate, public_key):
+    root_cert_json =  {
+        "certificate": {
+            "certificate": "-----BEGIN CERTIFICATE-----\nMIIa...nLCZM0pYJ\n-----END CERTIFICATE-----",
+            "public_key": "-----BEGIN PUBLIC KEY-----\nMIIBI...Sh/5\nlQIDAQAB\n-----END PUBLIC KEY-----\n",
+        },
+        "name": "avi01-rootca-2",
+    }
+    return cert_jsondef get_root_cert_json():
+
+def get_cert_json(certificate: str, passphrase):
+    # The certificate needs to be one line where newlines are converted to "\n"...
+    cert = certificate.replace(' ', '').replace("\n", '\n')
+    cert_json = {
+        "certificate": {
+            "certificate": cert,
+        },
+        "key_passphrase": passphrase,
+        "name": "avi01-2",
+    }
     return cert_json
 
 def get_avi_object(api_endpoint, path, login_response, avi_username, avi_password, token):
@@ -97,28 +115,34 @@ if obj_details is not None:
 
     if not root_cert_name_found:
         # create a json for the root cert
-        cert_json = get_cert_json()
-        cert_json["name"] = root_cert_name
-        # finish it and POST it to AVI
+        root_cert_json = get_cert_json()
+        root_cert_json["name"] = root_cert_name
+        # ...
+        response = put_avi_object(api_endpoint, login_response, root_cert_json, avi_vm_ip, avi_username, avi_password, token)
+        if response.status_code < 300:
+            pmsg.green("Root Certificate in AVI OK.")
+            exit_code = 0
+        else:
+            pmsg.fail("Can't POST the Root/Intermediate certificate to AVI." + str(response.status_code) + " " + response.text)
 
     if not cert_name_found:
         # create a json for the controller certificate
-        cert_json = get_cert_json()
+        # AVI wants a certificate, private key and passphrase...
+        cert_json = get_cert_json(avi_certificate, private_key, passphrase)
         cert_json["name"] = cert_name
-        # finish it and POST it to AVI
+        # ...
+        response = put_avi_object(api_endpoint, login_response, cert_json, avi_vm_ip, avi_username, avi_password, token)
+        if response.status_code < 300:
+            pmsg.green("Client Certificate in AVI OK.")
+            exit_code = 0
+        else:
+            pmsg.fail("Can't POST the client certificate to AVI." + str(response.status_code) + " " + response.text)
+
 pmsg.warning("Not working yet.")
 exit(1)
 
 # ##################### PUT AVI Object #############################################
 if not cert_name_found:
-    response = put_avi_object(api_endpoint, login_response, obj_details, avi_vm_ip, avi_username, avi_password, token)
-    if response.status_code < 300:
-        pmsg.green("Response is what I expected.")
-        exit_code = 0
-    else:
-        pmsg.fail("Can't send object back..." + str(response.status_code) + " " + response.text)
-else:
-    pmsg.fail("Can't retrieve AVI data from path: " + path + ".")
 
 if logged_in:
     helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)

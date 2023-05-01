@@ -90,7 +90,7 @@ avi_root_certificate: |
   -----END CERTIFICATE-----
   
 splunk_url: "http-inputs-mck.splunkcloud.com"
-splunk_port: "8088"
+splunk_port: "443"
 splunk_token: "652B8AE7-C0F3-4284-8BD0-43968A215F46"
 # #################################################################################
 # This section contains parameters that are the same for each Distribution Center...
