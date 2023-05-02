@@ -11,14 +11,17 @@ import pmsg
 import re
 import os
 import interpolate
+import pdb
 
 package_namespace = os.environ["installed_packages_namespace"]
 site_name = os.environ["site_name"]
 values_file = "templates/fluent-bit-default-values.yaml"
 completed_values_file = "/tmp/" + site_name + "-fluent-bit-default-values.yaml"
+pdb.set_trace()
+interpolate.interpolate_from_environment_to_template(values_file, completed_values_file)
 
 # Is fluent-bit already running?
-if helper.check_for_result(["tanzu", "package", "installed", "list", "-A"], 'fluent-bit.*Reconcile succeeded'):
+if False
     pmsg.green("The fluent-bit is OK.")
 
 else:
@@ -33,7 +36,6 @@ else:
 
     if found_cm:
         # Interpolate values file...
-        interpolate.interpolate_from_environment_to_template(values_file, completed_values_file)
         helper.run_a_command_list(["tanzu", "package", "install", "fluent-bit", "--package-name", "fluent-bit.tanzu.vmware.com", "--values-file", completed_values_file, "--namespace", package_namespace, "--version", fb_version, "--create-namespace"])
 
         # Run the command to check for reconciliation complete...

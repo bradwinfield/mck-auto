@@ -220,10 +220,12 @@ if not add_to_environment({"site_name": site_name}):
     pmsg.fail("Can't add the site name to the environment.")
 
 # Some automation steps can only use one NTP or DNS server, so create singleton variables...
-parts = re.split(' |,|;', configs["dns_servers"].replace(" ", ""))
-add_to_environment({"dns_server": parts[0]})
-parts = re.split(' |,|;', configs["ntp_servers"].replace(" ", ""))
-add_to_environment({"ntp_server": parts[0]})
+if "dns_servers" in configs.keys():
+    parts = re.split(' |,|;', configs["dns_servers"].replace(" ", ""))
+    add_to_environment({"dns_server": parts[0]})
+if "ntp_servers" in configs.keys():
+    parts = re.split(' |,|;', configs["ntp_servers"].replace(" ", ""))
+    add_to_environment({"ntp_server": parts[0]})
 
 # Prompt for password...
 if password_noprompt:
@@ -259,6 +261,8 @@ for idx, step in enumerate(steps):
 
     # Ignore comment/empty lines..match.
     if re.search("^\\s*#|^\\s*$|^abort", step, re.IGNORECASE) is not None:
+        if re.search("^abort", step, re.IGNORECASE) is None:
+            pmsg.normal(step)
         continue
 
     # If step is an "exit", then exit.

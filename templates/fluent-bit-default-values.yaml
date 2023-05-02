@@ -16,6 +16,7 @@ fluent_bit:
         Host              {{ splunk_url }}
         Port              {{ splunk_port }}
         splunk_token      {{ splunk_token }}
+        tls               on
     inputs: |
       [INPUT]
         Name              tail
