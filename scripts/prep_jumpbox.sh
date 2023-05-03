@@ -7,15 +7,17 @@ cd $HOME
 echo
 echo 'Get the CLI bundles (tanzu, velero) from vmware. Do not bother getting kubectl at this time.'
 echo See: https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.6/vmware-tanzu-kubernetes-grid-16/GUID-install-cli.html
-echo Or go directly to: https://customerconnect.vmware.com/downloads/details?downloadGroup=TKG-161&productId=988 
+echo 'Or go directly to: https://customerconnect.vmware.com/downloads/details?downloadGroup=TKG-161&productId=988'
 echo I am assuming that the files will end up in your Downloads subdirectory.
+echo This can be skipped if the 'tanzu' and 'velero' commands are already on this system.
 echo Hit return when done.
 read ANS
 
 echo "=================================== Download kubectl vsphere-plugin"
 echo "Use your browser to go to your vCenter, navigate to Inventory and find your namespace."
-echo "From there, find the "Status" panel. Then click the "Open" link which will lead you"
+echo "From there, find the 'Status' panel. Then click the 'Open' link which will lead you"
 echo "to downloading the kubectl CLI tools."
+echo This can be skipped if the 'kubectl' with the vsphere plugins are already on this system.
 echo "Hit return when you have it downloaded."
 read ANS
 

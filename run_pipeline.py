@@ -25,18 +25,11 @@ errors = 0
 # This script will prepare an on-premise vSphere environment for
 # its first deployment of a TKGs workload cluster.
 
-
-def dprint(msg):
-    if verbose is True:
-        pmsg.debug(msg)
-
-
 def confirm_file(filename):
     for fname in os.listdir("."):
         if fname == filename:
             return True
     return False
-
 
 def exit_with_messages(total_errors):
     pmsg.normal ("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -53,7 +46,6 @@ def add_to_environment(configs):
     count = 0
     for varname in configs:
         if configs[varname] is not None:
-            dprint("Putting " + str(varname) + " in the environment...")
             os.environ[varname] = configs[varname]
             os.environ["TF_VAR_"+varname] = configs[varname]
             count += 1
@@ -97,7 +89,6 @@ def run_terraform_init():
         return False
     return True
 
-
 def next_step_is_abort(steps, idx):
     if idx >= len(steps) - 1:
         # last line. 
@@ -113,15 +104,15 @@ def site_terraform(tfolder, vsphere_server, site_name):
     # if site_terraform does not exist, create it
     if not os.path.isdir("site_terraform"):
         os.mkdir("site_terraform")
-        os.chmod("site_terraform", stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
+        os.chmod("site_terraform", stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     # if the site_dir does not exist, create it
     if not os.path.isdir(site_dir):
         os.mkdir(site_dir)
-        os.chmod(site_dir, stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
+        os.chmod(site_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     if not os.path.isdir(terraform_dir):
         # and copy in the tfolder (template) tf files...
         shutil.copytree(tfolder, terraform_dir)
-        os.chmod(terraform_dir, stat.S_IRWXG | stat.S_IRWXU | stat.S_IROTH)
+        os.chmod(terraform_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     # return the site_dir
     return terraform_dir
 
@@ -145,7 +136,6 @@ def run_terraform(tfolder):
                 # run terraform apply
                 result = helper.run_a_command("terraform apply myplan.tfplan")
                 if result == 0:
-                    dprint("Terraform of " + tfolder + " completed successfully.")
                     exit_code = 0
                 else:
                     pmsg.fail("Terraform apply failed in " + tfolder + ".")
@@ -159,33 +149,21 @@ def run_terraform(tfolder):
     os.chdir(dir_orig)
     return exit_code
 
+
 # ########################### Main ################################
 # setup args...
 help_text = "Run a a pipeline to setup a TKGs "+vcenter_version+" workload cluster on vSphere.\n"
 help_text += "Examples:\n"
 help_text += "./run_pipeline.py --help\n"
+help_text += "./run_pipeline.py -c config.yaml -s steps.conf -p access.yaml\n"
 
 parser = argparse.ArgumentParser(description='Pipeline main script to deploy a TKGs workload cluster.')
 parser.add_argument('-c', '--config_file', required=True, help='Name of yaml file which contains config params')
 parser.add_argument('-s', '--steps_file', required=True, help='Name of steps file; what scripts will run this time.')
 parser.add_argument('-p', '--password_file', required=False, help='Name of additional configs file (secrets).')
-parser.add_argument('-d', '--dry_run', default=False, action='store_true', required=False, help='Just check things... do not make any changes.')
-parser.add_argument('-v', '--verbose', default=False, action='store_true', required=False, help='Verbose output.')
-parser.add_argument('-n', '--pw_from_env', default=False, action='store_true', required=False, help='PWs from $password.')
 
 args = parser.parse_args()
-verbose = args.verbose
-dry_run = args.dry_run
-password_noprompt = args.pw_from_env
 password_file = args.password_file
-
-dry_run_flag = ""
-if dry_run:
-    dry_run_flag = " --dry_run"
-
-verbose_flag = ""
-if verbose:
-    verbose_flag = " --verbose"
 
 rc, configs = read_yaml_config_file(args.config_file)
 if not rc or configs is None:
@@ -233,11 +211,8 @@ if "ntp_servers" in configs.keys():
     parts = re.split(' |,|;', configs["ntp_servers"].replace(" ", ""))
     add_to_environment({"ntp_server": parts[0]})
 
-# Prompt for password...
-if password_noprompt:
-    pw = os.environ["password"]
-    add_to_environment({"vsphere_password": pw, "tkg_user_password": pw, "avi_vsphere_password": pw, "avi_password": pw})
-elif password_file is not None:
+# Get passwords from file or prompt for password...
+if password_file is not None:
     add_environment_overrides(password_file)
 else:
     prompt_text = "vCenter Admin: " + os.environ["vsphere_username"] + " password: "
