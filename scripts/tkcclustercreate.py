@@ -10,7 +10,8 @@ import time
 site_name = os.environ["site_name"]
 yaml_source = os.environ["config_file"]
 template_file = "templates/workload-cluster-template.yaml"
-output_file = "/tmp/" + site_name + "-tkc_result"
+user = os.environ["USER"]
+output_file = "/tmp/" + user + "_" + site_name + "-tkc_result"
 workload_cluster = os.environ["workload_cluster"]
 vsphere_namespace = os.environ["vsphere_namespace"]
 

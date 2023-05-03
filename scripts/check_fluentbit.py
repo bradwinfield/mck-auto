@@ -16,12 +16,13 @@ import pdb
 package_namespace = os.environ["installed_packages_namespace"]
 site_name = os.environ["site_name"]
 values_file = "templates/fluent-bit-default-values.yaml"
-completed_values_file = "/tmp/" + site_name + "-fluent-bit-default-values.yaml"
+user = os.environ["USER"]
+completed_values_file = "/tmp/" + user + "_" + site_name + "-fluent-bit-default-values.yaml"
 pdb.set_trace()
 interpolate.interpolate_from_environment_to_template(values_file, completed_values_file)
 
 # Is fluent-bit already running?
-if False
+if False:
     pmsg.green("The fluent-bit is OK.")
 
 else:

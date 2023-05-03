@@ -10,7 +10,8 @@ import os
 site_name = os.environ["site_name"]
 yaml_source = os.environ["config_file"]
 template_file = "templates/custom_storage_class.yaml"
-output_file = "/tmp/" + site_name + "-sc_result"
+user = os.environ["USER"]
+output_file = "/tmp/" + user + "_" + site_name + "-sc_result"
 customsc = os.environ["custom_storage_class_name"]
 storagepolicy = os.environ["storage_policy_name"]
 

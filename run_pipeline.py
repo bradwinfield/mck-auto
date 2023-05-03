@@ -106,9 +106,8 @@ def next_step_is_abort(steps, idx):
         return True
     return False
 
-def site_terraform(tfolder, vsphere_server):
+def site_terraform(tfolder, vsphere_server, site_name):
     # parse vsphere_server to get the site name
-    site_name = re.split('\.', vsphere_server)[0]
     site_dir = "site_terraform/" + site_name
     terraform_dir = site_dir + "/" + tfolder
     # if site_terraform does not exist, create it
@@ -219,6 +218,13 @@ site_name = re.split('\.', configs["vsphere_server"])[0]
 if not add_to_environment({"site_name": site_name}):
     pmsg.fail("Can't add the site name to the environment.")
 
+if "USER" in os.environ.keys():
+    user = os.environ["USER"]
+    if re.search(' ', user) is not None:
+        add_to_environment("USER", user.replace(' ', ''))
+else:
+    add_to_environment("USER", "no_user")
+
 # Some automation steps can only use one NTP or DNS server, so create singleton variables...
 if "dns_servers" in configs.keys():
     parts = re.split(' |,|;', configs["dns_servers"].replace(" ", ""))
@@ -303,7 +309,7 @@ for idx, step in enumerate(steps):
                 step_type = "terraform"
                 now = datetime.now()
                 pmsg.blue(str(now))
-                errors = run_terraform(site_terraform(step, configs["vsphere_server"]))
+                errors = run_terraform(site_terraform(step, configs["vsphere_server"], site_name))
                 ran_step = True
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):

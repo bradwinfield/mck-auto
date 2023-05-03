@@ -6,7 +6,8 @@ import helper
 import os
 
 workload_cluster = os.environ["workload_cluster"]
-kubeconfig_dir = "/tmp/"+workload_cluster+"_kubeconfig"
+user = os.environ["USER"]
+kubeconfig_dir = "/tmp/" + user + "_" + workload_cluster+"_kubeconfig"
 kubeconfig = kubeconfig_dir + "/config"
 
 helper.add_env_override(True, "KUBECONFIG", kubeconfig)
