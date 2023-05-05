@@ -24,7 +24,7 @@ full_url = "https://" + vsphere_server + "/invsvc/mob3/?moid=authorizationServic
 
 def login_and_get_nonce(full_url):
     nonce = ""
-    
+
     # Create a session and set the authentication headers
     session = requests.session()
     session.auth = (username, password)

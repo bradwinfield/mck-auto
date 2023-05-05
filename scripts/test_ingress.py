@@ -11,6 +11,7 @@ import time
 rc = 1
 
 helper.run_a_command("kubectl create ns test-ingress")
+helper.run_a_command("kubectl create rolebinding auth-users-priv --clusterrole=psp:vmware-system-privileged --group=system:authenticated -n test-ingress")
 helper.run_a_command("kubectl apply -f https://projectcontour.io/examples/httpbin.yaml -n test-ingress")
 
 cmd = ["kubectl", "get", "ingress", "-n", "test-ingress"]
@@ -32,6 +33,7 @@ if helper.check_for_result_for_a_time(cmd, expression, 5, 20):
                     rc = 0
                 else:
                     pmsg.fail("Smoke test of the ingress controller failed (http error: " + str(response.status_code) + "). Recommend checking ingress by hand.")
+                    pmsg.normal("Test manually with: curl -H \"Host: httpbin\" http://$(k get ingress -n test-ingress|grep -v ADDRESS|awk '{print $4}')/")
                 break
             else:
                 pmsg.fail("Smoke test of the ingress controller failed because pods did not become ready. Recommend checking ingress by hand.")

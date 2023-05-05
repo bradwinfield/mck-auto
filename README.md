@@ -1,17 +1,17 @@
 # mckesson-dscsa-deployment
 This repository contains code to deploy clusters to a vSphere 7.0.3 environment. At a high level, it will
 1. Install and configure AVI including making it highly available (HA)
-1. Enable Workload Management in vSphere
-1. Create a vSphere Namespace
-1. Create a workload cluster
-1. Install kapp
-1. Pull down the tanzu packages
-1. Install cert-manager
-1. Install Contour
-1. Install Fluentbit
-1. Create rolebindings
-1. Create Storage Classes
-1. Run a smoke test to validate that ingress is working
+2. Enable Workload Management in vSphere
+3. Create a vSphere Namespace
+4. Create a workload cluster
+5. Install kapp
+6. Pull down the tanzu packages
+7. Install cert-manager
+8. Install Contour
+9. Install Fluentbit
+10. Create rolebindings
+11. Create Storage Classes
+12. Run a smoke test to validate that ingress is working
 
 There are additional scripts that have been used in specific environments for specific reasons. The things that the pipeline does depends on what "steps" are in the steps file passed to the ./run_pipeline.py command which will be described below.
 
@@ -40,11 +40,11 @@ You can add as many scripts as you need (in ./scripts). Again, the run_pipeline.
 ## Prepare the environment
 To prepare to run the automation:
 1. Prepare a jumpbox (recommend Ubuntu Desktop). You will have to manually install 'git' to get started. I also like to manuall install openssh-server so I can just ssh to the jumpbox.
-1. Use 'git clone ...' to download the automation software. The clone URL will be provided upon request. Run "cd mck-auto" to get into the automation directory. You can 'git clone ...' to any location but you need to be in that directory to run the pipeline.
-1. Install all the required tools. You may run the script: ./scripts/prep_jumpbox.sh which will do this for you. Note that there are several places where the prep_jumpbox.sh script will prompt you to download files from the vmware and other places. You may do this using the Web Console of the Jumpbox and it's web browser. The downloaded files are expected to be in your user directory '~/Downloads' subdirectory. Every user that will run the automation will need to prepare their environment which can be safely done by running ./scripts/prep_jumpbox.sh.
-1. Copy the config.yaml file to a site-specific config file (e.g. atl1-config.yaml) and fill in all the values for the specific site - This contains all the variables needed to build up a TKGs cluster starting from vSphere 7.0.3 at the given site.
-1. Copy the steps.conf file to a site-specific steps file (e.g. atl1-steps.conf) - This file contains the list of steps (script names as found in the scripts subdirectory -OR- terrform subdirectory names) that will be run.
-1. Copy the passwords.yaml file to create a site-specific file for the passwords used and created for the given site (e.g. atl1-access.yaml) - This file contains the passwords for vCenter, AVI and the service accounts that will be created (tkg-admin and avi-admin).
+2. Use 'git clone ...' to download the automation software. The clone URL will be provided upon request. Run "cd mck-auto" to get into the automation directory. You can 'git clone ...' to any location but you need to be in that directory to run the pipeline.
+3. Install all the required tools. You may run the script: ./scripts/prep_jumpbox.sh which will do this for you. Note that there are several places where the prep_jumpbox.sh script will prompt you to download files from the vmware and other places. You may do this using the Web Console of the Jumpbox and it's web browser. The downloaded files are expected to be in your user directory '~/Downloads' subdirectory. Every user that will run the automation will need to prepare their environment which can be safely done by running ./scripts/prep_jumpbox.sh.
+4. Copy the config.yaml file to a site-specific config file (e.g. atl1-config.yaml) and fill in all the values for the specific site - This contains all the variables needed to build up a TKGs cluster starting from vSphere 7.0.3 at the given site.
+5. Copy the steps.conf file to a site-specific steps file (e.g. atl1-steps.conf) - This file contains the list of steps (script names as found in the scripts subdirectory -OR- terrform subdirectory names) that will be run.
+6. Copy the passwords.yaml file to create a site-specific file for the passwords used and created for the given site (e.g. atl1-access.yaml) - This file contains the passwords for vCenter, AVI and the service accounts that will be created (tkg-admin and avi-admin).
 
 After these things are complete you are ready to run the automation.
 
@@ -76,9 +76,9 @@ In order to add steps to this TKGs deployment system
 
 ### add a new script
 1. Create a new script in the 'scripts' subdirectory. Access the config.yaml data by using the environment variables by the same name.
-1. Scripts should exit(0) if they ran correctly and exit(>0) if not.
-1. Scripts must be executable. You can make a file executable by running $ chmod 774 scripts/"scriptname".
-1. Add the script name in the appropriate place in the steps file. Note that you can have a steps config file with just what you want to test as long as all the dependencies are already met in the target system.
+2. Scripts should exit(0) if they ran correctly and exit(>0) if not.
+3. Scripts must be executable. You can make a file executable by running $ chmod 775 scripts/"scriptname".
+4. Add the script name in the appropriate place in the steps file. Note that you can have a steps config file with just what you want to test as long as all the dependencies are already met in the target system.
 
 ### add terraform
 You can add terraform if that is best for adding capabilities to this deployment system by either:
