@@ -15,6 +15,7 @@ read ANS
 
 echo "=================================== Download kubectl vsphere-plugin"
 echo "Use your browser to go to your vCenter, navigate to Inventory and find your namespace."
+echo "If there is only a supervisor cluster, then you can go to the IP of one of the supervisor cluster IPs."
 echo "From there, find the 'Status' panel. Then click the 'Open' link which will lead you"
 echo "to downloading the kubectl CLI tools."
 echo This can be skipped if the 'kubectl' with the vsphere plugins are already on this system.
