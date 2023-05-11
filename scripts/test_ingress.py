@@ -13,6 +13,7 @@ rc = 1
 helper.run_a_command("kubectl create ns test-ingress")
 helper.run_a_command("kubectl create rolebinding auth-users-priv --clusterrole=psp:vmware-system-privileged --group=system:authenticated -n test-ingress")
 helper.run_a_command("kubectl apply -f https://projectcontour.io/examples/httpbin.yaml -n test-ingress")
+time.sleep(30)
 
 cmd = ["kubectl", "get", "ingress", "-n", "test-ingress"]
 expression = "httpbin.*\\s(\\d{1,3}.){4}"

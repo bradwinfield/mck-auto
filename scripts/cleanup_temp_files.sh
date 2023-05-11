@@ -6,4 +6,4 @@
 rm -rf /tmp/${USER}_${site_name}*
 
 # Get rid of the site_terraform/$site_name files...
-rm -rf site_terraform/${site_name}
+rm -rf site_terraform/*

@@ -50,4 +50,4 @@ for i in range(1, 10):
         exit(1)
     else:
         time.sleep(30)
-        pmsg.normal("Try creating the workload cluster again...")
+        pmsg.normal("Supervisor Cluster not quite ready. Wait a minute and try creating the workload cluster again...")

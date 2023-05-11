@@ -15,8 +15,8 @@ def api_get(server, path, token):
     :param server: vCenter server IP or FQDN
     :param path: URL path to GET
     :param token: The session token as returned by vcenter_api.vcenter_login()
-    :returns: Boolean
-    :rtype: bool
+    :returns: json object
+    :rtype: dictionary
     """
 
     header = {"vmware-api-session-id": token}
