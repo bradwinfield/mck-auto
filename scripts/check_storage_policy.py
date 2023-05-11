@@ -1,63 +1,80 @@
 #!/usr/bin/env python3
 
-# Checks for storage policy; creates it if missing.
+# Check for storage policy; create it if it is missing in vCenter.
 
-import vcenter_api
-import vsphere_mob
-import pmsg
 import os
+import pmsg
 import helper
+import vsphere_mob
+from pyVmomi import pbm, VmomiSupport, vim
+import argparse
 import pdb
+import cli
+import ssl
+import service_instance
 
-def create_resource_pool(vsphere_server, token, resource_pool, vsphere_cluster_id, parent_resource_pool_id):
-    found_rg = False
-    json_data = {"name": resource_pool, "parent": parent_resource_pool_id}
-    id = vcenter_api.api_post_returns_content(vsphere_server, "/api/vcenter/resource-pool", token, json_data, 201)
-    if id is not None:
-        pmsg.green ("Resource Pool: " + resource_pool + " created.")
-        found_rg = True
-        helper.add_env_override(True, "avi_resource_pool_id", id.decode().strip('"'))
-    else:
-        pmsg.fail ("I can't create the Resource Group: " + resource_pool + ". You may want to create it manually. Please check Resource groups in vCenter and try again.")
-    return found_rg
-
-def use_mob():
-    mob = vsphere_mob.vsphere_mob(False)
-    c = mob.login(vsphere_server, vsphere_username, vsphere_password, True)
-    content = c.content
-    if content is None:
-        pmsg.fail("Could not login to the MOB SOAP API. Check your user credentials in the config.yaml and try again. Exiting.")
-        exit (2)
-
-    storage_policy_manager = content.storageResourceManager
-    pdb.set_trace()
-
-
-################################ Main #############################
-
+# Get server and credentials from the environment...
 vsphere_server = os.environ["vsphere_server"]
 vsphere_username = os.environ["vsphere_username"]
 vsphere_password = os.environ["vsphere_password"]
+vsphere_datacenter = os.environ["vsphere_datacenter"]
+cluster_name = os.environ["cluster_name"]
 storage_class = os.environ["storage_class"]
 
-# use_mob()
+# retrieve SPBM API endpoint
+def get_pbm_connection(vpxd_stub):
+    from http import cookies
+    import pyVmomi
+    session_cookie = vpxd_stub.cookie.split('"')[1]
+    http_context = VmomiSupport.GetHttpContext()
+    cookie = cookies.SimpleCookie()
+    cookie["vmware_soap_session"] = session_cookie
+    http_context["cookies"] = cookie
+    VmomiSupport.GetRequestContext()["vcSessionCookie"] = session_cookie
+    hostname = vpxd_stub.host.split(":")[0]
 
-token = vcenter_api.vcenter_login(vsphere_server, vsphere_username, vsphere_password)
-if len(token) < 1:
-    pmsg.fail("No token obtained from login api call to vSphere. Check your user credentials in the config.yaml and try again. Exiting.")
-    exit (9)
+    context = None
+    if hasattr(ssl, "_create_unverified_context"):
+        context = ssl._create_unverified_context()
+    pbm_stub = pyVmomi.SoapStubAdapter(
+        host=hostname,
+        version="pbm.version.version1",
+        path="/pbm/sdk",
+        poolSize=0,
+        sslContext=context)
+    pbm_si = pbm.ServiceInstance("ServiceInstance", pbm_stub)
+    pbm_content = pbm_si.RetrieveContent()
 
-exit_code = 1
+    return pbm_si, pbm_content
 
-response = vcenter_api.api_get(vsphere_server, "/api/vcenter/storage/policies", token)
-if response is not None:
-    for policy in response:
-        pmsg.normal("Name: = " + policy["name"])
-        if policy["name"] == storage_class:
-            pmsg.green("Storage Policy is OK.")
-            pdb.set_trace()
-            exit(0)
 
-pmsg.normal("Creating Storage Policy: " + storage_class + "...")
+# Connect to SPBM Endpoint
+args = argparse.Namespace()
+args.host = vsphere_server
+args.port = 443
+args.user = vsphere_username
+args.password = vsphere_password
+args.disable_ssl_verification = True
 
-exit(exit_code)
+si = service_instance.connect(args)
+pbm_si, pbm_content = get_pbm_connection(si._stub)
+
+pm = pbm_content.profileManager
+profile_ids = pm.PbmQueryProfile(
+    resourceType=pbm.profile.ResourceType(resourceType="STORAGE"),
+    profileCategory="REQUIREMENT"
+)
+
+profiles = []
+if len(profile_ids) > 0:
+    profiles = pm.PbmRetrieveContent(profileIds=profile_ids)
+
+for profile in profiles:
+    if profile.name == storage_class:
+        pmsg.green ("Storage profile in vSphere OK.")
+        print(profile)
+        exit(0)
+
+# If I get here, the storage profile does not exist.
+pmsg.fail("Storage profile in vSphere not found.")
+exit(1)
