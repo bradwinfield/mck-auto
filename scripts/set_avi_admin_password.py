@@ -10,7 +10,6 @@ import json
 import pmsg
 import helper_avi
 import re
-import pdb
 
 urllib3.disable_warnings()
 
@@ -171,7 +170,6 @@ response = requests.get(api_endpoint + path, headers=headers, cookies=next_cooki
 if response.status_code > 299:
     pmsg.fail("Can't get system config data from AVI. HTTP: " + str(response.status_code) + " " + response.text)
     do_exit(1)
-pdb.set_trace()
 backup_payload = json.loads(response.text)
 backup_payload["backup_passphrase"] = os.environ["vsphere_password"]
 

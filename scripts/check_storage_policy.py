@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 
 # Check for storage policy; create it if it is missing in vCenter.
+# NOTE: Values are hard-coded in this script for the storage class.
 
 import os
 import pmsg
-import helper
-import vsphere_mob
-from pyVmomi import pbm, VmomiSupport, vim
 import argparse
-import pdb
-import cli
 import ssl
 import service_instance
+from pyVmomi import pbm, VmomiSupport
 
 # Get server and credentials from the environment...
 vsphere_server = os.environ["vsphere_server"]
@@ -72,9 +69,70 @@ if len(profile_ids) > 0:
 for profile in profiles:
     if profile.name == storage_class:
         pmsg.green ("Storage profile in vSphere OK.")
-        print(profile)
         exit(0)
 
 # If I get here, the storage profile does not exist.
-pmsg.fail("Storage profile in vSphere not found.")
+pmsg.normal("Storage profile in vSphere not found.")
+
+# Step 2 - see Notes
+vSanCapable = False
+resourceTypes = pm.FetchResourceType()
+rt_found = None
+
+# Loop to find the STORAGE resourceType
+for rt in resourceTypes:
+    if rt.resourceType == 'STORAGE':
+        vendorInfo = pm.PbmFetchVendorInfo(rt)
+
+        # Walk through list to find VSAN (or not)
+        for vrti in vendorInfo:
+            if vrti.resourceType == 'STORAGE':
+                for vnsinfo in vrti.vendorNamespaceInfo:
+                    if vnsinfo.namespaceInfo.namespace == 'VSAN':
+                        vSanCapable = True
+                        rt_found = rt
+
+if vSanCapable:
+    metadata = pm.PbmFetchCapabilityMetadata(rt_found)
+
+    propertyInstancevar = pbm.capability.PropertyInstance()
+    propertyInstancevar.id = 'stripeWidth'
+    propertyInstancevar.value = 1
+
+    constraintvar = pbm.capability.ConstraintInstance()
+    constraintvar.propertyInstance = [propertyInstancevar]
+
+    idvar = pbm.capability.CapabilityMetadata.UniqueId()
+    idvar.id = 'stripeWidth'
+    idvar.namespace = 'VSAN'
+
+    capability = pbm.PbmCapabilityInstance()
+    capability.id = idvar
+    capability.constraint = [constraintvar]
+
+    subprofilevar = pbm.profile.SubProfileCapabilityConstraints.SubProfile()
+    subprofilevar.capability = [capability]
+
+    constraintsvar = pbm.profile.SubProfileCapabilityConstraints()
+    constraintsvar.subProfiles = [subprofilevar]
+
+    spec = pbm.profile.CapabilityBasedProfileCreateSpec()
+    spec.name = storage_class
+    spec.description = 'Created via script "check_storage_policy.py".'
+    spec.category = 'REQUIREMENT'
+    spec.resourceType = rt_found
+    spec.constraints = constraintsvar
+
+    # Finally, create the Storage Profile in vSphere...
+    profile_id = pm.PbmCreate(spec)
+    if profile_id is not None:
+        pmsg.green ("Storage profile in vSphere OK.")
+        exit(0)
+    else:
+        pmsg.fail("Could not create the vSphere Storage Class: " + storage_class + ". Recommand creating by hand.")
+
+else:
+    pmsg.fail("VSAN storage policies not supported in this vSphere.")
+    exit(1)
+
 exit(1)

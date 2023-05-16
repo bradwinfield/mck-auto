@@ -88,7 +88,16 @@ avi_root_certificate: |
   -----BEGIN CERTIFICATE-----
   MIIDRTCCAi2gAwI...
   -----END CERTIFICATE-----
-  
+
+avi_private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  MIIEpQ...
+  -----END RSA PRIVATE KEY-----
+
+avi_passphrase: ""
+avi_root_cert_name: "avi-root"
+avi_controller_cert_name: "avi-controller"
+
 splunk_url: "http-inputs-mck.splunkcloud.com"
 splunk_port: "443"
 splunk_token: "redacted"
@@ -96,6 +105,7 @@ splunk_token: "redacted"
 # This section contains parameters that are the same for each Distribution Center...
 vsphere_namespace_owner: "tkg-admin"
 vsphere_namespace_owner_domain: "local.os"
+
 
 tkg_user: "tkg-admin"
 tkg_user_password: "prompt"
