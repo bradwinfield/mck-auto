@@ -22,11 +22,6 @@ avi_certificate = os.environ["avi_certificate"]
 avi_root_certificate = os.environ["avi_root_certificate"]
 avi_private_key = os.environ["avi_private_key"]
 avi_passphrase = os.environ["avi_passphrase"]
-vsphere_server = os.environ["vsphere_server"]
-vsphere_username = os.environ["vsphere_username"]
-vsphere_password = os.environ["vsphere_password"]
-vsphere_datacenter = os.environ["vsphere_datacenter"]
-
 
 if "avi_controller_cert_name" in os.environ.keys():
     cert_name = os.environ["avi_controller_cert_name"]

@@ -24,11 +24,6 @@ if "avi_controller_cert_name" in os.environ.keys():
 else:
     cert_name = "avi-controller"
 
-if "avi_root_cert_name" in os.environ.keys():
-    root_cert_name = os.environ["avi_root_cert_name"]
-else:
-    root_cert_name = "avi-root"
-
 avi_vm_ip = avi_floating_ip
 
 if "avi_vm_ip_override" in os.environ.keys():
