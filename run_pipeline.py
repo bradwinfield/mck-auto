@@ -192,7 +192,8 @@ if not add_to_environment(configs):
     pmsg.fail("Can't add config file entries into the environment.")
     exit(1)
 
-site_name = re.split('\.', configs["vsphere_server"])[0]
+#site_name = re.split('\.', configs["vsphere_server"])[0]
+site_name = configs["vsphere_server"][0:4]
 if not add_to_environment({"site_name": site_name}):
     pmsg.fail("Can't add the site name to the environment.")
 
