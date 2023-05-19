@@ -39,7 +39,7 @@ You can add as many scripts as you need (in ./scripts). Again, the run_pipeline.
 
 ## Prepare the environment
 To prepare to run the automation:
-1. Prepare a jumpbox (recommend Ubuntu Desktop). You will have to manually install 'git' to get started. I also like to manuall install openssh-server so I can just ssh to the jumpbox.
+1. Prepare a jumpbox (recommend Ubuntu Desktop). You will have to manually install 'git' to get started. I also like to manually install openssh-server so I can just ssh to the jumpbox.
 2. Use 'git clone ...' to download the automation software. The clone URL will be provided upon request. Run "cd mck-auto" to get into the automation directory. You can 'git clone ...' to any location but you need to be in that directory to run the pipeline.
 3. Install all the required tools. You may run the script: ./scripts/prep_jumpbox.sh which will do this for you. Note that there are several places where the prep_jumpbox.sh script will prompt you to download files from the vmware and other places. You may do this using the Web Console of the Jumpbox and it's web browser. The downloaded files are expected to be in your user directory '~/Downloads' subdirectory. Every user that will run the automation will need to prepare their environment which can be safely done by running ./scripts/prep_jumpbox.sh.
 4. Copy the config.yaml file to a site-specific config file (e.g. atl1-config.yaml) and fill in all the values for the specific site - This contains all the variables needed to build up a TKGs cluster starting from vSphere 7.0.3 at the given site.

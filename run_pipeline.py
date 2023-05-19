@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
+# This script will run scripts or terraform
+# in the order found in the steps file.
+# It will take a flat config.yaml file
+# and put all the variables and values in the environment first
+# Then it will run each step as found in the steps file.
+
 import argparse
-import importlib.util
 import os
+import signal
 import sys
 import yaml
 import re
@@ -21,9 +27,18 @@ vcenter_version = "7.0.3"
 # Global variables
 total_errors = 0
 errors = 0
+cleanup_script = "./scripts/cleanup_temp_files.sh"
 
-# This script will prepare an on-premise vSphere environment for
-# its first deployment of a TKGs workload cluster.
+def signal_handler(sig, frame):
+    now = datetime.now()
+    pmsg.blue("Pipeline aborted by operator at: " + str(now))
+    pmsg.normal("Cleaning up temporary files.")
+    if os.path.exists(cleanup_script):
+        helper.run_a_command(cleanup_script)
+    else:
+        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/*")
+    sys.exit(1)
+
 
 def confirm_file(filename):
     for fname in os.listdir("."):
@@ -37,6 +52,11 @@ def exit_with_messages(total_errors):
         pmsg.warning("Number of errors/warnings encountered: " + str(total_errors) + ".")
     else:
         pmsg.green("Success! There were no errors or warnings.")
+
+    if os.path.exists(cleanup_script):
+        helper.run_a_command(cleanup_script)
+    else:
+        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/*")
 
     now = datetime.now()
     pmsg.blue("Pipeline ending at: " + str(now))
@@ -91,7 +111,7 @@ def run_terraform_init():
 
 def next_step_is_abort(steps, idx):
     if idx >= len(steps) - 1:
-        # last line. 
+        # last line.
         return False
     if re.match('abort', steps[idx+1], re.IGNORECASE) is not None:
         return True
@@ -151,6 +171,9 @@ def run_terraform(tfolder):
 
 
 # ########################### Main ################################
+# Capture control-C
+signal.signal(signal.SIGINT, signal_handler)
+
 # setup args...
 help_text = "Run a a pipeline to setup a TKGs "+vcenter_version+" workload cluster on vSphere.\n"
 help_text += "Examples:\n"

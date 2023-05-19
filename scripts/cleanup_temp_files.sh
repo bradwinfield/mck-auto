@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 # Removes all files in temp used by this run of the pipeline
 
 # Get rid of the scripts temp files

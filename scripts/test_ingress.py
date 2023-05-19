@@ -26,13 +26,19 @@ if helper.check_for_result_for_a_time(cmd, expression, 5, 20):
             ip_address = re.split('\\s+', line)[3]
             url = "http://" + ip_address + "/"
             if helper.check_for_result_for_a_time(["kubectl", "get", "replicaset", "-n", "test-ingress"], "httpbin.*3.*3.*3", 4, 10):
+                time.sleep(50)
                 pmsg.blue("Trying to access test app using ingress at URL: " + url)
-                time.sleep(5)
-                response = requests.get(url, headers={"Host": "httpbin"})
-                if response.status_code >= 200 and response.status_code < 300:
-                    pmsg.green("Smoke test of the ingress controller OK.")
-                    rc = 0
-                else:
+                max_tries = 10
+                ntries = 0
+                while ntries < max_tries:
+                    response = requests.get(url, headers={"Host": "httpbin"})
+                    ntries += 1
+                    if response.status_code >= 200 and response.status_code < 300:
+                        pmsg.green("Smoke test of the ingress controller OK.")
+                        rc = 0
+                        break
+                    time.sleep(20)
+                if rc > 0:
                     pmsg.fail("Smoke test of the ingress controller failed (http error: " + str(response.status_code) + "). Recommend checking ingress by hand.")
                     pmsg.normal("Test manually with: curl -H \"Host: httpbin\" http://$(k get ingress -n test-ingress|grep -v ADDRESS|awk '{print $4}')/")
                 break
