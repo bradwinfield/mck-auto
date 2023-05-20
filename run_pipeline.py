@@ -60,6 +60,7 @@ def exit_with_messages(total_errors):
 
     now = datetime.now()
     pmsg.blue("Pipeline ending at: " + str(now))
+    pmsg.print_log_file_msg()
     exit(total_errors)
 
 def add_to_environment(configs):
