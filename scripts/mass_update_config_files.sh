@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 
 # Changes all the config.yaml files found in /usr/src/cloud-development/tanzu-cluster-config/*/config.yaml
+# Set $cluster_config_dir to override the default config directory.
 
 USAGE="$0 <variable-name> <new-value>"
 if [[ $# -ne 2 ]]; then
     echo $USAGE
+    echo "Note: If you set the environment variable \"cluster_config_dir\", it will override the default."
     exit 1
 fi
 
-cluster_config_dir="/usr/src/cloud-development/tanzu-cluster-config"
+if [[ -z $cluster_config_dir ]]; then
+    cluster_config_dir="/usr/src/cloud-development/tanzu-cluster-config"
+fi
 
 varname=$1
 value=$2
