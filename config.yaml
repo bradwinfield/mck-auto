@@ -111,17 +111,16 @@ avi_resource_pool: "avi"
 cp_vmclass_size: "best-effort-medium"
 control_plane_count: "1"
 worker_node_count: "3"
-worker_vmclass_size: "best-effort-medium"
+worker_vmclass_size: "best-effort-large"
 ctrd_disksize: "25Gi"
 kubelet_disksize: "15Gi"
 tkr: "v1.22.9---vmware.1-tkg.1.cc71bc8"
+#tkr: "v1.23.8---vmware.3-tkg.1"
 
 tanzu_package_registry: "projects.registry.vmware.com/tkg/packages/standard/repo"
 tanzu_package_registry_version: "v1.6.1"
 tanzu_standard_package_repo_name: "tanzupackages"
 installed_packages_namespace: "tanzu-packages"
-
-
 
 # Unused below here
 avi_ca_data_b64: 
