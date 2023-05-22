@@ -5,7 +5,7 @@
 
 USAGE="$0 <variable-name> <new-value>"
 if [[ $# -ne 2 ]]; then
-    echo $USAGE
+    echo "Usage: $USAGE"
     echo "Note: If you set the environment variable \"cluster_config_dir\", it will override the default."
     exit 1
 fi
