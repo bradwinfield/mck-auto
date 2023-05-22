@@ -9,7 +9,6 @@ if [[ $# -ne 2 ]]; then
 fi
 
 cluster_config_dir="/usr/src/cloud-development/tanzu-cluster-config"
-cluster_config_dir="$HOME/tanzu-cluster-config"
 
 varname=$1
 value=$2
