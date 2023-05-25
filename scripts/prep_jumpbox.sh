@@ -52,9 +52,11 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.
 sudo apt-get update
 sudo apt-get install helm
 
-
 echo "Adding python libraries needed for automation..."
 pip3 install pyVmomi
+pip3 install pyVim
+pip3 install requests
+pip3 install pyyaml
 pip3 install jinja2
 
 if [[ $tanzu_available ]]; then
@@ -119,16 +121,13 @@ sudo tar -xzvf Downloads/go1.20.2.linux-amd64.tar.gz -C Downloads
 sudo mv Downloads/go /usr/local
 
 # Check for go already in PATH
-echo $PATH | grep -qE '.usr.local.go.bin'
-if [[ $? -ne 0 ]]; then
-  echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
-  echo "export GOPATH=$HOME/go" >> ~/.bashrc
-  echo "export PATH=$PATH:$GOPATH/bin" >> ~/.bashrc
-fi
+echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
+echo "export GOPATH=$HOME/go" >> ~/.bashrc
+echo "export PATH=$PATH:$GOPATH/bin" >> ~/.bashrc
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
-# source ~/.bashrc
+echo "NOTE: Run $ source ~/.bashrc  # when this script finishes."
 go version
 echo "Go-lang Installed now"
 
@@ -166,3 +165,5 @@ sudo snap install docker
 docker --version
 
 newgrp docker
+
+echo "NOTE: Run $ source ~/.bashrc"

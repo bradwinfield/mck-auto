@@ -57,6 +57,11 @@ def run_a_command(command):
 
 #############################################################
 def run_a_command_get_stdout(command_and_args_list):
+    """
+    :param command and args: string array of command and arguments.
+    :returns: String - stdout of command
+    :rtype: str
+    """
     tlines = []
     process = subprocess.Popen(command_and_args_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, err = process.communicate()

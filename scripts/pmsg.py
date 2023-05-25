@@ -28,7 +28,7 @@ def print_log_file_msg():
 
 def log_filename():
     site_name = os.environ["site_name"]
-    return "/tmp/" + site_name + "_deployment.log"
+    return "logs/" + site_name + "_deployment.log"
 
 def printm(msg):
     print(msg)

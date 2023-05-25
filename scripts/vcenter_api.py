@@ -7,7 +7,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 from pyVmomi import vim
 import pmsg
-
+import pdb
 
 
 def api_get(server, path, token):
@@ -61,9 +61,9 @@ def api_post(server, path, token, data, success_code):
 
     # Some posts don't return content
     try:
-        json_obj = json.loads(response.content.decode())
-    except:
-        pass
+        json.loads(response.content.decode())
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
     if response.status_code == success_code:
         return True
     pmsg.warning ("Response: " + "api_post with data: " + str(data) + " returned status code: " + str(response.status_code))
@@ -86,9 +86,10 @@ def api_post_returns_content(server, path, token, data, success_code):
 
     # Some posts don't return content
     try:
-        json_obj = json.loads(response.content.decode())
-    except:
-        pass
+        json.loads(response.content.decode())
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
     if response.status_code == success_code:
         return response.content
     pmsg.warning ("Response: " + "api_post with data: " + str(data) + " returned status code: " + str(response.status_code))
