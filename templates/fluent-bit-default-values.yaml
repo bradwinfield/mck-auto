@@ -18,25 +18,25 @@ fluent_bit:
         splunk_token      {{ splunk_token }}
         tls               on
     inputs: |
-      [INPUT]
-        Name              tail
-        Tag               kube.*
-        Path              /var/log/containers/*.log
-        Parser            cri
-        DB                /var/log/flb_kube.db
-        Mem_Buf_Limit     5MB
-        Skip_Long_Lines   On
-        Refresh_Interval  10
-
-      [INPUT]
-        Name                systemd
-        Tag                 kube_systemd.*
-        Path                /var/log/journal
-        DB                  /var/log/flb_kube_systemd.db
-        Systemd_Filter      _SYSTEMD_UNIT=kubelet.service
-        Systemd_Filter      _SYSTEMD_UNIT=containerd.service
-        Read_From_Tail      On
-        Strip_Underscores   On
+#      [INPUT]
+#        Name              tail
+#        Tag               kube.*
+#        Path              /var/log/containers/*.log
+#        Parser            cri
+#        DB                /var/log/flb_kube.db
+#        Mem_Buf_Limit     5MB
+#        Skip_Long_Lines   On
+#        Refresh_Interval  10
+#
+#      [INPUT]
+#        Name                systemd
+#        Tag                 kube_systemd.*
+#        Path                /var/log/journal
+#        DB                  /var/log/flb_kube_systemd.db
+#        Systemd_Filter      _SYSTEMD_UNIT=kubelet.service
+#        Systemd_Filter      _SYSTEMD_UNIT=containerd.service
+#        Read_From_Tail      On
+#        Strip_Underscores   On
 
       [INPUT]
         Name              tail
