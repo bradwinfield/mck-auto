@@ -1,4 +1,5 @@
 ---
+deployment_log: "/usr/src/cloud-development/logs/vc01_deployment.log"
 # Distribution Center parameters - This section will be specific to a Distribution Center.
 vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
