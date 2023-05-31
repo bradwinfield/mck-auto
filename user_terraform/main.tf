@@ -18,10 +18,10 @@ variable "cluster_name" {
   type        = string
   description = "Cluster name."
 }
-variable "tkg_user" {
-  type        = string
-  description = "TKG Admin User name."
-}
+#variable "tkg_user" {
+#  type        = string
+#  description = "TKG Admin User name."
+#}
 variable "tkg_role" {
   type        = string
   description = "TKG role name."
@@ -30,10 +30,10 @@ variable "avi_role" {
   type        = string
   description = "AVI role name."
 }
-variable "avi_vsphere_username" {
-  type        = string
-  description = "AVI vSphere User name."
-}
+#variable "avi_vsphere_username" {
+#  type        = string
+#  description = "AVI vSphere User name."
+#}
 provider "vsphere" {
   user           = var.vsphere_username
   password       = var.vsphere_password
