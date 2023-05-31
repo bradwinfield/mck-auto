@@ -12,6 +12,9 @@ def dprint(msg):
 
 def check_vcenter_user(server, token, username, password):
     found_user = False
+    if "@na.corp" in username:
+        pmsg.warning("Users in @na.corp... not manageable with the vCenter API.")
+        return False
     if "@vsphere.local" in username:
         pmsg.warning("Users in @vsphere.local not manageable with the vCenter API.")
         return False
