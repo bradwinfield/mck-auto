@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Class and Methods for interacting with the MOB3 SOAP interface.
+# Note: Only adding the avi-admin user to Global Permissions.
 
 import requests
 import re
@@ -59,11 +60,11 @@ if nonce == "":
     pmsg.fail("Can't find the vmware-session-nonce in mob call.")
     exit(1)
 
-if add_user_to_global_permissions(session, full_url, tkg_user, tkg_role_id, nonce):
-    pmsg.green("User/role " + tkg_user + "/" + tkg_role + " global permission OK.")
-else:
-    pmsg.fail("Failed to add User/role " + tkg_user + "/" + tkg_role + " as a global permission.")
-    exit(1)
+#if add_user_to_global_permissions(session, full_url, tkg_user, tkg_role_id, nonce):
+#    pmsg.green("User/role " + tkg_user + "/" + tkg_role + " global permission OK.")
+#else:
+#    pmsg.fail("Failed to add User/role " + tkg_user + "/" + tkg_role + " as a global permission.")
+#    exit(1)
 
 if add_user_to_global_permissions(session, full_url, avi_vsphere_username, avi_role_id, nonce):
     pmsg.green("User/role " + avi_vsphere_username + "/" + avi_role + " global permission OK.")
