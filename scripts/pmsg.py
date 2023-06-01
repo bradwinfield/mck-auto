@@ -29,7 +29,10 @@ def print_log_file_msg():
 def log_filename():
     # site_name = os.environ["site_name"]
     # return "logs/" + site_name + "_deployment.log"
-    return os.environ["deployment_log"]
+    if "deployment_log" in os.environ.keys():
+        return os.environ["deployment_log"]
+    else:
+        return "/tmp/deployment_log"
 
 def printm(msg):
     print(msg)
