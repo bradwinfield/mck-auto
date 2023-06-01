@@ -9,7 +9,6 @@ import yaml
 import os
 import subprocess
 import pmsg
-import pdb
 
 cert_file_name = "/tmp/leaf.crt"
 key_file_name = "/tmp/private.key"
@@ -35,7 +34,6 @@ key_file.close()
 
 md5_crt = subprocess.getoutput(f'openssl x509 -noout -modulus -in {cert_file_name} | openssl md5')
 md5_key = subprocess.getoutput(f'openssl rsa -noout -modulus -in {key_file_name} | openssl md5')
-pdb.set_trace()
 
 if md5_crt == md5_key:
     pmsg.green("Certificate and Private key OK.")
