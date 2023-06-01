@@ -36,7 +36,7 @@ def signal_handler(sig, frame):
     if os.path.exists(cleanup_script):
         helper.run_a_command(cleanup_script)
     else:
-        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/*")
+        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/" + site_name + ".")
     sys.exit(1)
 
 
@@ -56,7 +56,7 @@ def exit_with_messages(total_errors):
     if os.path.exists(cleanup_script):
         helper.run_a_command(cleanup_script)
     else:
-        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/*")
+        pmsg.fail("Can't cleanup the temp files. Expected to find: " + cleanup_script + ". Recommend cleaning by hand: sudo rm -rf ./site_terraform/" + site_name + ".")
 
     now = datetime.now()
     pmsg.blue("Pipeline ending at: " + str(now))

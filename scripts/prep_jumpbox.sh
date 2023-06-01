@@ -123,10 +123,10 @@ sudo mv Downloads/go /usr/local
 # Check for go already in PATH
 echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
 echo "export GOPATH=$HOME/go" >> ~/.bashrc
-echo "export PATH=$PATH:$GOPATH/bin" >> ~/.bashrc
+echo "export PATH=$PATH:$HOME/go/bin" >> ~/.bashrc
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$HOME/go/bin
 echo "NOTE: Run $ source ~/.bashrc  # when this script finishes."
 go version
 echo "Go-lang Installed now"

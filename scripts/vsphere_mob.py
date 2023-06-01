@@ -3,7 +3,7 @@
 # Class that contains common routines for accessing vSphere Managed Objects.
 # vCenter API imports
 import ssl
-from pyvim.connect import SmartConnect, Disconnect
+from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 # CONSTANTS
