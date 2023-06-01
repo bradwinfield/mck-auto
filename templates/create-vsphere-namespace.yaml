@@ -11,6 +11,22 @@ spec:
       role: OWNER
       subject: {{ vsphere_namespace_owner }}
       subject_type: USER
+    - domain: "na.corp.mckesson.com"
+      role: OWNER
+      subject: "psas_vsp_admins"
+      subject_type: USER
+    - domain: "na.corp.mckesson.com"
+      role: EDIT
+      subject: "psas_vsp_clu_ops"
+      subject_type: USER
+    - domain: "na.corp.mckesson.com"
+      role: VIEW
+      subject: "psas_vsp_k8clu_admin"
+      subject_type: USER
+    - domain: "na.corp.mckesson.com"
+      role: VIEW
+      subject: "psas_dsr_k8clu_ops"
+      subject_type: USER
   cluster: "{{ vsphere_cluster_id }}"
   config_status: RUNNING
   description: ''
