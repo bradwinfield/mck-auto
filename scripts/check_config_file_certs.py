@@ -13,6 +13,10 @@ import pmsg
 cert_file_name = "/tmp/leaf.crt"
 key_file_name = "/tmp/private.key"
 
+if len(sys.argv) < 2:
+    pmsg.normal(f'Usage: {sys.argv[0]} <site config file name>')
+    exit(1)
+
 config_file = sys.argv[1]
 
 with open(config_file, 'r') as cf:
