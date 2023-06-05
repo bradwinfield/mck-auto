@@ -13,10 +13,6 @@ import helper
 import pmsg
 import pdb
 
-if len(sys.argv) < 2:
-    pmsg.normal(f'Usage: {sys.argv[0]} <cert parent directory>')
-    exit(1)
-
 def has_cert(subdir):
     for file in os.listdir(subdir):
         if 'crt' in file:
@@ -24,7 +20,12 @@ def has_cert(subdir):
     return False
 
 
+if len(sys.argv) < 2:
+    pmsg.normal(f'Usage: {sys.argv[0]} <cert parent directory>')
+    exit(1)
 directory = sys.argv[1]
+user = os.environ["USER"]
+os.environ["deployment_log"] = "/tmp/" + user + ".log"
 
 for obj in os.listdir(directory):
     if os.path.isdir(directory + "/" + obj):
