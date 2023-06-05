@@ -11,6 +11,7 @@ import sys
 import os
 import subprocess
 import pmsg
+import re
 
 if len(sys.argv) < 2:
     pmsg.normal(f'Usage: {sys.argv[0]} <cert directory>')
@@ -19,13 +20,12 @@ if len(sys.argv) < 2:
 directory = sys.argv[1]
 
 for file in os.listdir(directory):
-    if '.key' in file:
+    if re.search('.key$', file) is not None:
         key_file_name = directory + "/" + file
-    if '.crt' in file:
+    if re.search('.crt$', file) is not None:
         cert_file_name = directory + "/" + file
 
 result = subprocess.getoutput(f'openssl x509 -in {cert_file_name} -noout -text | grep -E "Issuer:|Subject:|DNS:"')
-pmsg.normal("\nCertificate details =-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 pmsg.normal(cert_file_name)
 pmsg.normal(result)
 
