@@ -13,6 +13,17 @@ import subprocess
 import pmsg
 import re
 
+def file_readable(file):
+    if os.path.isfile(file) and os.access(file, os.R_OK):
+        return True
+    return False
+
+def get_file_modulus(file):
+    if file_readable(file):
+        return subprocess.getoutput(f'openssl x509 -noout -modulus -in {file}')
+    return None
+
+    
 if len(sys.argv) < 2:
     pmsg.normal(f'Usage: {sys.argv[0]} <cert directory>')
     exit(1)
@@ -25,17 +36,29 @@ for file in os.listdir(directory):
     if re.search('.crt$', file) is not None:
         cert_file_name = directory + "/" + file
 
-result = subprocess.getoutput(f'openssl x509 -in {cert_file_name} -noout -text | grep -E "Issuer:|Subject:|DNS:"')
-pmsg.normal(cert_file_name)
-pmsg.normal(result)
+check_cert = True
+if not file_readable(cert_file_name):
+    pmsg.fail("Can't read cert file " + cert_file_name)
+    check_cert = False
 
-# Get the md5 checksum and compare them...
-md5_crt = subprocess.getoutput(f'openssl x509 -noout -modulus -in {cert_file_name} | openssl md5')
-md5_key = subprocess.getoutput(f'openssl rsa -noout -modulus -in {key_file_name} | openssl md5')
+if not file_readable(key_file_name):
+    pmsg.fail("Can't read key file " + key_file_name)
+    check_cert = False
 
-if md5_crt == md5_key:
-    pmsg.green("Certificate and Private key OK.")
-else:
-    pmsg.fail("Certificate and Private key do not match.")
+if check_cert:
+    result = subprocess.getoutput(f'openssl x509 -in {cert_file_name} -noout -text | grep -E "Issuer:|Subject:|DNS:"')
+    pmsg.normal(cert_file_name)
+    pmsg.normal(result)
 
-pmsg.normal(key_file_name)
+    # Get the md5 checksum and compare them...
+    mod_crt = subprocess.getoutput(f'openssl x509 -noout -modulus -in {cert_file_name}')
+    if len(mod_crt) < 1:
+        pmsg.fail("Bad crt file.")
+    mod_key = subprocess.getoutput(f'openssl rsa -noout -modulus -in {key_file_name}')
+
+    if mod_crt == mod_key:
+        pmsg.green("Certificate and Private key OK.")
+    else:
+        pmsg.fail("Certificate and Private key do not match.")
+
+    pmsg.normal(key_file_name)
