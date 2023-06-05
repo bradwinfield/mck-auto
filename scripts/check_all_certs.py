@@ -11,6 +11,7 @@ import sys
 import os
 import helper
 import pmsg
+import pdb
 
 if len(sys.argv) < 2:
     pmsg.normal(f'Usage: {sys.argv[0]} <cert parent directory>')
@@ -25,8 +26,9 @@ def has_cert(subdir):
 
 directory = sys.argv[1]
 
-for subdir in os.listdir(directory):
-    path = directory + "/" + subdir
-    if os.path.isdir(path) and has_cert(path):
-        pmsg.blue(f"\n=========== Examining Certs in {path} ==================================")
-        helper.run_a_command("./scripts/check_cert.py " + path)
+for obj in os.listdir(directory):
+    if os.path.isdir(directory + "/" + obj):
+        path = directory + "/" + obj
+        if os.path.isdir(path) and has_cert(path):
+            pmsg.normal(f"\n=========== Examining Certs in {path}")
+            helper.run_a_command("./scripts/check_cert.py " + path)
