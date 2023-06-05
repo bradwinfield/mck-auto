@@ -7,10 +7,6 @@ metadata:
 spec:
   namespace: "{{ vsphere_namespace }}"
   access_list:
-    - domain: {{ vsphere_namespace_owner_domain }}
-      role: OWNER
-      subject: {{ vsphere_namespace_owner }}
-      subject_type: USER
     - domain: "na.corp.mckesson.com"
       role: OWNER
       subject: "psas_vsp_admins"
