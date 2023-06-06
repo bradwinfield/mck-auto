@@ -31,7 +31,7 @@ if len(sys.argv) < 2:
     exit(1)
 
 directory = sys.argv[1]
-keypassword_file = directory + "../keypasswd"
+keypassword_file = directory + "/../../keypasswd"
 
 for file in os.listdir(directory):
     if re.search('.key.enc$', file) is not None:
@@ -57,7 +57,7 @@ if check_cert:
     mod_crt = subprocess.getoutput(f'openssl x509 -noout -modulus -in {cert_file_name}')
     if len(mod_crt) < 1:
         pmsg.fail("Bad crt file.")
-    mod_key = subprocess.getoutput(f'openssl rsa -in {key_file_name} -passin file:{keypassword_file} | openssl rsa -noout -modulus')
+    mod_key = subprocess.getoutput(f'openssl rsa -in {key_file_name} -passin file:{keypassword_file} | openssl rsa -noout -modulus 2>/dev/null')
 
     if mod_crt == mod_key:
         pmsg.green("Certificate and Private key OK.")

@@ -3,9 +3,13 @@
 # Dumps details about all certs and the private keys.
 # Arguments: <directory>
 
-# The directory is expected to have subdirectories where each on has files
-# *.crt
-# *.key
+# The directory is expected to have subdirectories where each one has subdirectories:
+# .../avi
+# .../vcenter
+# .../<others>
+#   And eash subdirectory has files
+#   *.crt
+#   *.key
 
 import sys
 import os

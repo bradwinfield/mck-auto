@@ -18,10 +18,14 @@ spec:
       vmClass: {{ worker_vmclass_size }}
       storageClass: {{ storage_class }}
       volumes:
-        - name: varlib
-          mountPath: /var/lib
+        - name: containerd
+          mountPath: /var/lib/containerd
           capacity:
-            storage: {{ varlib_disksize }}
+            storage: {{ ctrd_disksize }}
+        - name: kubelet
+          mountPath: /var/lib/kubelet
+          capacity:
+            storage: {{ kubelet_disksize }}  
       tkr:  
         reference:
           name: {{ tkr }}
