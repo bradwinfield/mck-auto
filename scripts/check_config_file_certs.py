@@ -10,6 +10,7 @@ import os
 import subprocess
 import pmsg
 
+os.environ["deployment_log"] = "/tmp/" + os.environ["USER"] + "_deployment.log"
 cert_file_name = "/tmp/leaf.crt"
 key_file_name = "/tmp/private.key"
 

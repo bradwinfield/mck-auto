@@ -23,15 +23,18 @@ def get_file_modulus(file):
         return subprocess.getoutput(f'openssl x509 -noout -modulus -in {file}')
     return None
 
-    
+
+os.environ["deployment_log"] = "/tmp/" + os.environ["USER"] + "_deployment.log"
+
 if len(sys.argv) < 2:
     pmsg.normal(f'Usage: {sys.argv[0]} <cert directory>')
     exit(1)
 
 directory = sys.argv[1]
+keypassword_file = directory + "../keypasswd"
 
 for file in os.listdir(directory):
-    if re.search('.key$', file) is not None:
+    if re.search('.key.enc$', file) is not None:
         key_file_name = directory + "/" + file
     if re.search('.crt$', file) is not None:
         cert_file_name = directory + "/" + file
@@ -54,7 +57,7 @@ if check_cert:
     mod_crt = subprocess.getoutput(f'openssl x509 -noout -modulus -in {cert_file_name}')
     if len(mod_crt) < 1:
         pmsg.fail("Bad crt file.")
-    mod_key = subprocess.getoutput(f'openssl rsa -noout -modulus -in {key_file_name}')
+    mod_key = subprocess.getoutput(f'openssl rsa -in {key_file_name} -passin file:{keypassword_file} | openssl rsa -noout -modulus')
 
     if mod_crt == mod_key:
         pmsg.green("Certificate and Private key OK.")
@@ -62,3 +65,6 @@ if check_cert:
         pmsg.fail("Certificate and Private key do not match.")
 
     pmsg.normal(key_file_name)
+
+else:
+    pmsg.fail("Can't check certificate: " + cert_file_name)

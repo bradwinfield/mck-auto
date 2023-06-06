@@ -25,7 +25,7 @@ if len(sys.argv) < 2:
     exit(1)
 directory = sys.argv[1]
 user = os.environ["USER"]
-os.environ["deployment_log"] = "/tmp/" + user + ".log"
+os.environ["deployment_log"] = "/tmp/" + user + "_deployment.log"
 
 for obj in os.listdir(directory):
     if os.path.isdir(directory + "/" + obj):
