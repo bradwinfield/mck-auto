@@ -1,6 +1,6 @@
 ---
-deployment_log: "/usr/src/cloud-development/logs/vc01_deployment.log"
 # Distribution Center parameters - This section will be specific to a Distribution Center.
+deployment_log: "/usr/src/cloud-development/logs/vc01_deployment.log"
 vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "prompt"
@@ -112,7 +112,8 @@ avi_resource_pool: "avi"
 cp_vmclass_size: "best-effort-medium"
 control_plane_count: "1"
 worker_node_count: "3"
-worker_vmclass_size: "best-effort-large"
+worker_vmclass_size: "best-effort-2xlarge"
+varlib_disksize: "115Gi"
 ctrd_disksize: "25Gi"
 kubelet_disksize: "15Gi"
 tkr: "v1.22.9---vmware.1-tkg.1.cc71bc8"
