@@ -17,6 +17,7 @@ spec:
       replicas: {{ worker_node_count }}
       vmClass: {{ worker_vmclass_size }}
       storageClass: {{ storage_class }}
+      # NOTE: We experienced problems with configuring multiple volumes (sizes were flipped).
       volumes:
         - name: containerd
           mountPath: /var/lib/containerd
