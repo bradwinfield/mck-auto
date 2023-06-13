@@ -291,6 +291,8 @@ for idx, step in enumerate(steps):
         if len(step_parts) > 1:
             arguments = " ".join(step_parts[1:len(step_parts)])
         errors = helper.run_a_command(stepname + " " + arguments)
+        if errors > 0:
+            pmsg.blue("Error/Warning Count from previous step: " + str(errors))
         ran_step = True
         total_errors += errors
         if errors > 0 and next_step_is_abort(steps, idx):
@@ -310,6 +312,8 @@ for idx, step in enumerate(steps):
                 now = datetime.now()
                 pmsg.blue(str(now))
                 errors = run_terraform(site_terraform(step, configs["vsphere_server"], site_name))
+                if errors > 0:
+                    pmsg.blue("Error/Warning Count from previous step: " + str(errors))
                 ran_step = True
                 total_errors += errors
                 if errors > 0 and next_step_is_abort(steps, idx):
