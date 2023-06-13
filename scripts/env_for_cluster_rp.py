@@ -58,3 +58,5 @@ helper.add_env_override(False, "parent_resource_pool_id ", cluster_obj.resourceP
 for rp in cluster_obj.resourcePool.resourcePool:
     if rp.name == avi_resource_pool:
         helper.add_env_override(False, "avi_resource_pool_id", rp._moId)
+
+exit(0)

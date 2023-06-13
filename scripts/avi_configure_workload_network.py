@@ -118,7 +118,7 @@ if found_network:
     else:
         pmsg.fail("Can't update the network in AVI: " + str(response.status_code) + " " + response.text)
 else:
-    pmsg.fail("Can't find network: " + data_network_vsphere_portgroup_name + " in AVI.")
+    pmsg.fail("Can't find network: " + primary_workload_network_vsphere_portgroup_name + " in AVI.")
 
 if logged_in:
     helper_avi.logout(api_endpoint, login_response, avi_vm_ip, avi_username, avi_password, token)
