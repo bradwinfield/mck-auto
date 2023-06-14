@@ -94,6 +94,7 @@ if obj_details is not None:
     if response.status_code < 300:
         pmsg.green("System Configuration with Cert OK.")
         controller_status_code = 0
+        exit_code = 0
     else:
         pmsg.fail("Can't PUT the system configuration to AVI." + str(response.status_code) + " " + response.text)
 

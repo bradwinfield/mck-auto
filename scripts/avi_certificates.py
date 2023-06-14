@@ -138,6 +138,7 @@ if obj_details is not None:
         if response.status_code < 300:
             pmsg.green("Controller Certificate in AVI OK.")
             controller_status_code = 0
+            exit_code = 0
         else:
             pmsg.fail("Can't POST the client certificate to AVI." + str(response.status_code) + " " + response.text)
 else:
