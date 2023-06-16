@@ -55,8 +55,8 @@ fluent_bit:
       [FILTER]
         Name                cwd
         Match               node_audit.*
-        Exclude             type CWD
         Logical_Op          or
+        Exclude             type CWD
         Exclude             type SYSCALL
 
       [FILTER]
