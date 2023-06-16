@@ -74,6 +74,7 @@ if login_response.status_code >= 300:
 logged_in = True
 token = helper_avi.get_token(login_response, "")
 
+time.sleep(60)
 # ##################### GET AVI Object #############################################
 path = "/api/network"
 found_network = False
