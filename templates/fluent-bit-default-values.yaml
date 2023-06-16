@@ -54,12 +54,9 @@ fluent_bit:
     filters: |
       [FILTER]
         Name                cwd
-        Match               apiserver_audit.*
-        Exclude             type CWD
-
-      [FILTER]
-        Name                grep
         Match               node_audit.*
+        Exclude             type CWD
+        Logical_Op          or
         Exclude             type SYSCALL
 
       [FILTER]
