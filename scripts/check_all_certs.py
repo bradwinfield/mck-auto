@@ -26,6 +26,7 @@ def has_cert(subdir):
 
 if len(sys.argv) < 2:
     pmsg.normal(f'Usage: {sys.argv[0]} <cert parent directory>')
+    pmsg.normal("Note: To be run from the mck-auto root directory.")
     exit(1)
 directory = sys.argv[1]
 user = os.environ["USER"]
