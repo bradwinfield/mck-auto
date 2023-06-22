@@ -53,9 +53,8 @@ fluent_bit:
         Skip_Long_Lines   On
     filters: |
       [FILTER]
-        Name                cwd
+        Name                grep
         Match               node_audit.*
-        Logical_Op          or
         Exclude             type CWD
         Exclude             type SYSCALL
 
