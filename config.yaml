@@ -5,6 +5,7 @@ vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "prompt"
 supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
+tmc_hostname: "xxx.tmc.cloud.vmware.com"
 
 # What is the vsphere cluster name?
 cluster_name: vc01cl01
