@@ -4,6 +4,7 @@ deployment_log: "/usr/src/cloud-development/logs/vc01_deployment.log"
 vsphere_server: "vc01.h2o-75-9210.h2o.vmware.com"
 vsphere_username: "administrator@vsphere.local"
 vsphere_password: "prompt"
+vsphere_license: "xxxxxxxxxxxxxx"
 supervisor_cluster: "vc01cl01-wcp.h2o-75-9210.h2o.vmware.com"
 tmc_hostname: "xxx.tmc.cloud.vmware.com"
 
