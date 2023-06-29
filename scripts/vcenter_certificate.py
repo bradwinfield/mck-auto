@@ -6,6 +6,7 @@
 import vcenter_api
 import pmsg
 import os
+import pdb
 
 ################################ Main #############################
 vsphere_server = os.environ["vsphere_server"]
@@ -37,6 +38,7 @@ if cert == new_cert:
 else:
     pmsg.normal("Putting Supervisor Cluster endpoint certificate in place...")
     data = {"tls_endpoint_certificate": new_cert}
+    pdb.set_trace()
     success = vcenter_api.api_patch(vsphere_server, path, token, data, 204)
     if success:
         pmsg.green("Certificate OK.")
