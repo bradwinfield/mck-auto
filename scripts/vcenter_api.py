@@ -44,10 +44,35 @@ def api_delete(server, path, token):
         exit (2)
     return True
 
+def api_patch(server, path, token, data, success_code):
+    """ Calls the PATCH action to server/path with given data 
+    :param server: vCenter server IP or FQDN
+    :param path: URL path to PATCH
+    :param token: The session token as returned by vcenter_api.vcenter_login()
+    :param data: json formatted data to PATCH
+    :param success_code: HTTP return_code to expect. Anything else is treated as an error.
+    :returns: Boolean
+    :rtype: bool
+    """
+    # Returns True or False
+    header = {"vmware-api-session-id": token, "Content-Type": "application/json"}
+    url = "https://"+server+path
+    response = requests.patch(url, headers=header, verify=False, json=data)
+
+    # Some posts don't return content
+    try:
+        json.loads(response.content.decode())
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    if response.status_code == success_code:
+        return True
+    pmsg.warning ("Response: " + "api_post with data: " + str(data) + " returned status code: " + str(response.status_code))
+    return False
+
 def api_post(server, path, token, data, success_code):
     """ Calls the POST action to server/path with given data 
     :param server: vCenter server IP or FQDN
-    :param path: URL path to DELETE
+    :param path: URL path to POST
     :param token: The session token as returned by vcenter_api.vcenter_login()
     :param data: json formatted data to POST
     :param success_code: HTTP return_code to expect. Anything else is treated as an error.
@@ -72,7 +97,7 @@ def api_post(server, path, token, data, success_code):
 def api_post_returns_content(server, path, token, data, success_code):
     """ Calls the POST action to server/path with given data and returns content
     :param server: vCenter server IP or FQDN
-    :param path: URL path to DELETE
+    :param path: URL path to POST
     :param token: The session token as returned by vcenter_api.vcenter_login()
     :param data: json formatted data to POST
     :param success_code: HTTP return_code to expect. Anything else is treated as an error.

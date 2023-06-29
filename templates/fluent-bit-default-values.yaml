@@ -43,23 +43,12 @@ fluent_bit:
       #   Refresh_Interval  10
       #   Skip_Long_Lines   On      
 
-      # location does not exist
-      # [INPUT]
-      #   Name              tail
-      #   Tag               node_secure.*
-      #   Path              /var/log/secure
-      #   Parser            syslog-rfc5424
-      #   DB                /var/log/flb_system_secure.db
-      #   Mem_Buf_Limit     50MB
-      #   Refresh_Interval  10
-      #   Skip_Long_Lines   On
     filters: |
-      # filter not needed after removing node_audit.* location
-      # [FILTER]
-      #   Name                grep
-      #   Match               node_audit.*
-      #   Exclude             type CWD
-      #   Exclude             type SYSCALL
+      [FILTER]
+        Name                grep
+        Match               *
+        Exclude             requestURI readyz
+        Exclude             requestURI livez
 
       [FILTER]
         Name                record_modifier

@@ -4,7 +4,6 @@
 
 import vcenter_api
 import pmsg
-import argparse
 import os
 import helper
 
@@ -22,8 +21,6 @@ def create_resource_pool(server, token, resource_pool, vsphere_cluster_id, paren
 
 
 ################################ Main #############################
-# setup args...
-help_text = "Create/Check vCenter Resource Group for AVI install."
 
 server = os.environ["vsphere_server"]
 username = os.environ["vsphere_username"]
