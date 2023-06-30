@@ -15,8 +15,8 @@ vsphere_server = os.environ["vsphere_server"]
 username = os.environ["vsphere_username"]
 password = os.environ["vsphere_password"]
 tkg_user = os.environ["tkg_user"]
-tkg_role = os.environ["tkg_role"]
-tkg_role_id = os.environ["tkg_role_id"]
+# tkg_role = os.environ["tkg_role"]
+# tkg_role_id = os.environ["tkg_role_id"]
 avi_vsphere_username = os.environ["avi_vsphere_username"]
 avi_role = os.environ["avi_role"]
 avi_role_id = os.environ["avi_role_id"]
@@ -49,7 +49,7 @@ def add_user_to_global_permissions(session, full_url, user, role_id, nonce):
     response2 = session.post(full_url_post, verify=False)
 
     if response2.status_code != 200:
-        pmsg.fail("Can't add user/role: " + tkg_user + "/" + tkg_role_id + ".")
+        pmsg.fail("Can't add user/role: " + user + "/" + role_id + ".")
         return False
     return True
 
